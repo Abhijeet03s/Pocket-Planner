@@ -1,19 +1,20 @@
 import { ExpenseForm } from "@/app/components/ExpenseForm";
 import { ExpenseList } from "@/app/components/ExpenseList";
+import { Card } from "@/components/ui/card";
 
 export default function ExpensesPage() {
    return (
       <div>
-         <h1 className="text-2xl font-bold mb-4">Expense Management</h1>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-               <h2 className="text-xl font-semibold mb-2">Add New Expense</h2>
+         <h1 className="text-3xl font-bold text-gray-900 mb-6">Expense Management</h1>
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="p-6">
+               <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Expense</h2>
                <ExpenseForm />
-            </div>
-            <div>
-               <h2 className="text-xl font-semibold mb-2">Expense List</h2>
+            </Card>
+            <Card className="p-6">
+               <h2 className="text-xl font-semibold text-gray-900 mb-4">Expense List</h2>
                <ExpenseList />
-            </div>
+            </Card>
          </div>
       </div>
    );
