@@ -38,6 +38,7 @@ export async function GET(req: Request) {
    const { searchParams } = new URL(req.url);
    const startDate = searchParams.get('startDate');
    const endDate = searchParams.get('endDate');
+   const categoryId = searchParams.get('categoryId');
 
    let dateFilter = {};
    if (startDate && endDate) {
@@ -49,31 +50,30 @@ export async function GET(req: Request) {
       };
    }
 
+   let categoryFilter = {};
+   if (categoryId) {
+      categoryFilter = { categoryId };
+   }
+
    try {
       const expenses = await prisma.expense.findMany({
          where: {
             userId: session.user.id,
             ...dateFilter,
+            ...categoryFilter,
          },
          orderBy: {
             date: 'desc',
          },
-         select: {
-            id: true,
-            amount: true,
-            description: true,
-            date: true,
-         },
       });
 
-      // Creating a version of our expenses that is safe to serialize to JSON
-      const jsonSerializeExpenses = expenses.map(expense => ({
+      const jsonSafeExpenses = expenses.map(expense => ({
          ...expense,
          amount: expense.amount.toString(),
          date: expense.date.toISOString(),
       }));
 
-      return NextResponse.json(jsonSerializeExpenses);
+      return NextResponse.json(jsonSafeExpenses);
    } catch (error) {
       console.error('Failed to fetch expenses:', error);
       return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 });

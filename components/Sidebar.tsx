@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, DollarSign, User, BarChart2, Settings, PanelRightOpen } from "lucide-react";
+import { Home, DollarSign, User, Settings, PanelRightOpen } from "lucide-react";
 import { useState } from "react";
 
 const links = [
    { href: "/dashboard", label: "Dashboard", icon: Home },
    { href: "/dashboard/expenses", label: "Expenses", icon: DollarSign },
    { href: "/dashboard/profile", label: "Profile", icon: User },
-   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
    { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
