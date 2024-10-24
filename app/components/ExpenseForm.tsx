@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { categories, paymentModes } from '@/lib/constants';
-import { useExpenseContext } from "@/app/contexts/ExpenseContext";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const expenseSchema = z.object({
    amount: z.number().positive(),
@@ -37,7 +37,7 @@ const paymentIcons = {
 };
 
 export function ExpenseForm() {
-   const { triggerRefresh } = useExpenseContext();
+   const queryClient = useQueryClient();
    const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<ExpenseFormData>({
       resolver: zodResolver(expenseSchema),
       defaultValues: {
@@ -45,12 +45,10 @@ export function ExpenseForm() {
       }
    });
    const [date, setDate] = useState<Date | undefined>(new Date());
-   const [isLoading, setIsLoading] = useState(false);
    const { toast } = useToast();
 
-   const onSubmit = async (data: ExpenseFormData) => {
-      setIsLoading(true);
-      try {
+   const mutation = useMutation({
+      mutationFn: async (data: ExpenseFormData) => {
          const response = await fetch('/api/expenses', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -64,24 +62,28 @@ export function ExpenseForm() {
             throw new Error('Failed to create expense');
          }
 
+         return response.json();
+      },
+      onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ['expenses'] });
          toast({
             title: "Expense created",
             description: "Your expense has been successfully added.",
          });
          reset();
          setDate(new Date());
-         triggerRefresh(); // Add this line to trigger refresh
-      } catch (error) {
-         if (error instanceof Error) {
-            toast({
-               title: "Error",
-               description: "Failed to create expense. Please try again.",
-               variant: "destructive",
-            });
-         }
-      } finally {
-         setIsLoading(false);
+      },
+      onError: () => {
+         toast({
+            title: "Error",
+            description: "Failed to create expense. Please try again.",
+            variant: "destructive",
+         });
       }
+   });
+
+   const onSubmit = (data: ExpenseFormData) => {
+      mutation.mutate(data);
    };
 
    return (
@@ -183,8 +185,8 @@ export function ExpenseForm() {
             />
          </div>
 
-         <Button type="submit" disabled={isLoading} className="w-fit">
-            {isLoading ? 'Adding...' : 'Add Expense'}
+         <Button type="submit" disabled={mutation.isPending} className="w-fit">
+            {mutation.isPending ? 'Adding...' : 'Add Expense'}
          </Button>
       </form>
    );

@@ -14,7 +14,7 @@ export const categories = [
    { id: 'education', name: 'Education', icon: BookOpen, color: '#FDF2E9', textColor: '#D35400' },
    { id: 'travel', name: 'Travel', icon: Plane, color: '#E5E8E8', textColor: '#2C3E50' },
    { id: 'other', name: 'Other', icon: Package, color: '#EAECEE', textColor: '#7F8C8D' },
-];
+] as const;
 
 export const paymentModes = [
    { id: 'cash', name: 'Cash', icon: 'wallet' },
@@ -24,4 +24,4 @@ export const paymentModes = [
    { id: 'net-banking', name: 'Net Banking', icon: 'laptop' },
    { id: 'bank-transfer', name: 'Bank Transfer', icon: 'building-bank' },
    { id: 'other', name: 'Other', icon: 'more-horizontal' },
-];
+] as const;

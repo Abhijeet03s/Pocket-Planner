@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { categories } from '../../lib/constants';
 import { cn } from '@/lib/utils';
 import { createElement } from 'react';
 import { paymentModes } from '@/lib/constants';
-import { useExpenseContext } from '@/app/contexts/ExpenseContext';
+import { useQuery } from '@tanstack/react-query';
 
 type Expense = {
    id: string;
@@ -18,27 +18,34 @@ type Expense = {
    paymentMode: string;
 };
 
+const fetchExpenses = async (startDate: string, endDate: string): Promise<Expense[]> => {
+   const queryParams = new URLSearchParams();
+   if (startDate) queryParams.append('startDate', startDate);
+   if (endDate) queryParams.append('endDate', endDate);
+
+   const response = await fetch(`/api/expenses?${queryParams.toString()}`);
+   if (!response.ok) {
+      throw new Error('Failed to fetch expenses');
+   }
+   return response.json();
+};
+
 export function ExpenseList() {
-   const { refreshTrigger } = useExpenseContext();
-   const [expenses, setExpenses] = useState<Expense[]>([]);
    const [startDate, setStartDate] = useState('');
    const [endDate, setEndDate] = useState('');
 
-   const fetchExpenses = useCallback(async () => {
-      const queryParams = new URLSearchParams();
-      if (startDate) queryParams.append('startDate', startDate);
-      if (endDate) queryParams.append('endDate', endDate);
+   const { data: expenses = [], isLoading, isError } = useQuery({
+      queryKey: ['expenses', startDate, endDate],
+      queryFn: () => fetchExpenses(startDate, endDate),
+   });
 
-      const response = await fetch(`/api/expenses?${queryParams.toString()}`);
-      if (response.ok) {
-         const data = await response.json();
-         setExpenses(data);
-      }
-   }, [startDate, endDate]);
+   if (isLoading) {
+      return <div>Loading expenses...</div>;
+   }
 
-   useEffect(() => {
-      fetchExpenses();
-   }, [fetchExpenses, refreshTrigger]); // Add refreshTrigger to dependencies
+   if (isError) {
+      return <div>Error loading expenses</div>;
+   }
 
    const getCategoryDetails = (categoryId: string) => {
       return categories.find(category => category.id === categoryId) || categories[categories.length - 1];

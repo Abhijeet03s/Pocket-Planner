@@ -1,13 +1,11 @@
-'use client';
-
 import { ExpenseForm } from "@/app/components/ExpenseForm";
 import { ExpenseList } from "@/app/components/ExpenseList";
 import { Card } from "@/components/ui/card";
-import { ExpenseProvider } from "@/app/contexts/ExpenseContext";
+import { QueryClientProvider } from "@/app/providers/QueryClientProvider";
 
 export default function ExpensesPage() {
    return (
-      <ExpenseProvider>
+      <QueryClientProvider>
          <div>
             <h1 className="text-3xl font-bold text-gray-900 py-6">Expense Management</h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -21,6 +19,6 @@ export default function ExpensesPage() {
                </Card>
             </div>
          </div>
-      </ExpenseProvider>
+      </QueryClientProvider>
    );
 }
