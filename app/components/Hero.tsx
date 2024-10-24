@@ -5,7 +5,7 @@ import { satoshi, clashDisplay } from "@/app/fonts/font";
 export default function Hero() {
    return (
       <div className={`relative bg-hero bg-cover bg-fixed bg-center text-white ${clashDisplay.variable} ${satoshi.variable}`}>
-         <div className="absolute inset-0 bg-gradient-to-b from-black to-purple-900 opacity-80"></div>
+         <div className="absolute inset-0 bg-gradient-to-b from-black to-purple-900 opacity-80 pointer-events-none" aria-hidden="true"></div>
          <div className="relative container max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between min-h-screen px-4 py-16 md:py-24">
             <div className="w-full md:w-1/2 text-center md:text-left mb-12 md:mb-0">
                <h1 className="font-clash-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-tight">
@@ -32,8 +32,6 @@ export default function Hero() {
                      className="rounded-lg shadow-2xl w-full h-auto"
                   />
                </div>
-               <div className="hidden sm:block absolute -bottom-6 -right-6 w-24 h-24 sm:w-32 sm:h-32 bg-purple-400 rounded-full z-0 opacity-50 animate-pulse"></div>
-               <div className="hidden sm:block absolute -top-6 -left-6 w-20 h-20 sm:w-24 sm:h-24 bg-blue-400 rounded-full z-0 opacity-50 animate-pulse"></div>
             </div>
          </div>
       </div>

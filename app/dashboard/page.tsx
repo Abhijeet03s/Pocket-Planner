@@ -69,10 +69,6 @@ export default function DashboardPage() {
          </div>
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="p-6">
-               <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Expenses</h2>
-               {/* Add a list or table of recent expenses here */}
-            </Card>
-            <Card className="p-6">
                <h2 className="text-xl font-semibold text-gray-900 mb-4">Spending Overview</h2>
                {/* Add a chart or graph for spending overview here */}
             </Card>

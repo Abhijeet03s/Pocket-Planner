@@ -16,6 +16,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { categories, paymentModes } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { DialogClose } from "@/components/ui/dialog";
 
 const expenseSchema = z.object({
    amount: z.number().positive(),
@@ -72,6 +73,8 @@ export function ExpenseForm() {
          });
          reset();
          setDate(new Date());
+         const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
+         if (closeButton) closeButton.click();
       },
       onError: () => {
          toast({
@@ -87,7 +90,7 @@ export function ExpenseForm() {
    };
 
    return (
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
          <div>
             <Input
                type="number"
@@ -123,7 +126,6 @@ export function ExpenseForm() {
                {errors.categoryId && <p className="text-red-500">{errors.categoryId.message}</p>}
             </div>
 
-            {/* Payment Mode Selector - Takes 2 columns */}
             <div className="col-span-2">
                <Select onValueChange={(value) => setValue('paymentMode', value)}>
                   <SelectTrigger>
@@ -146,7 +148,6 @@ export function ExpenseForm() {
                {errors.paymentMode && <p className="text-red-500">{errors.paymentMode.message}</p>}
             </div>
 
-            {/* Date Picker - Takes 2 columns */}
             <div className="col-span-2">
                <Popover>
                   <PopoverTrigger asChild>
@@ -185,9 +186,14 @@ export function ExpenseForm() {
             />
          </div>
 
-         <Button type="submit" disabled={mutation.isPending} className="w-fit">
-            {mutation.isPending ? 'Adding...' : 'Add Expense'}
-         </Button>
+         <div className="flex justify-end gap-4 mt-6">
+            <DialogClose asChild>
+               <Button type="button" variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit" disabled={mutation.isPending}>
+               {mutation.isPending ? 'Adding...' : 'Add Expense'}
+            </Button>
+         </div>
       </form>
    );
 }
