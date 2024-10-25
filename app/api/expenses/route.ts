@@ -9,15 +9,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
    }
 
-   const { amount, description, date, categoryId } = await req.json();
-
    try {
+      const { amount, description, date, categoryId, paymentMode } = await req.json();
+
       const expense = await prisma.expense.create({
          data: {
-            amount,
-            description,
+            amount: amount,
+            description: description || "",
             date: new Date(date),
-            categoryId,
+            categoryId: categoryId,
+            paymentMode: paymentMode,
             userId: session.user.id,
          },
       });
@@ -25,7 +26,10 @@ export async function POST(req: Request) {
       return NextResponse.json(expense);
    } catch (error) {
       console.error('Failed to create expense:', error);
-      return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 });
+      return NextResponse.json(
+         { error: 'Failed to create expense' },
+         { status: 500 }
+      );
    }
 }
 

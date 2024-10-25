@@ -5,10 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Wallet, CreditCard, Smartphone, Laptop, Landmark, MoreHorizontal } from "lucide-react";
+import { Calendar as CalendarIcon, Wallet, CreditCard, Smartphone, Laptop, Landmark, MoreHorizontal, Loader2 } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -19,11 +18,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DialogClose } from "@/components/ui/dialog";
 
 const expenseSchema = z.object({
-   amount: z.number().positive(),
+   amount: z.number({
+      required_error: "Amount is required",
+      invalid_type_error: "Please enter a valid number",
+   }).positive("Amount must be greater than 0"),
    description: z.string().optional(),
-   date: z.date(),
-   categoryId: z.string().min(1, "Category is required"),
-   paymentMode: z.string().min(1, "Payment mode is required"),
+   date: z.date({
+      required_error: "Date is required",
+      invalid_type_error: "Please select a valid date",
+   }),
+   categoryId: z.string({
+      required_error: "Category is required",
+   }).min(1, "Please select a category"),
+   paymentMode: z.string({
+      required_error: "Payment mode is required",
+   }).min(1, "Please select a payment mode"),
 });
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
@@ -37,15 +46,23 @@ const paymentIcons = {
    'more-horizontal': MoreHorizontal,
 };
 
-export function ExpenseForm() {
+type ExpenseFormProps = {
+   onSuccess?: () => void;
+};
+
+export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
    const queryClient = useQueryClient();
-   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<ExpenseFormData>({
+   const {
+      register,
+      handleSubmit,
+      reset,
+      formState: { errors },
+      setValue,
+      clearErrors,
+   } = useForm<ExpenseFormData>({
       resolver: zodResolver(expenseSchema),
-      defaultValues: {
-         date: new Date(),
-      }
    });
-   const [date, setDate] = useState<Date | undefined>(new Date());
+   const [date, setDate] = useState<Date | undefined>(undefined);
    const { toast } = useToast();
 
    const mutation = useMutation({
@@ -54,13 +71,17 @@ export function ExpenseForm() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-               ...data,
+               amount: data.amount.toString(),
+               description: "",
                date: data.date.toISOString(),
+               categoryId: data.categoryId,
+               paymentMode: data.paymentMode,
             }),
          });
 
          if (!response.ok) {
-            throw new Error('Failed to create expense');
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to create expense');
          }
 
          return response.json();
@@ -68,18 +89,17 @@ export function ExpenseForm() {
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ['expenses'] });
          toast({
-            title: "Expense created",
-            description: "Your expense has been successfully added.",
+            title: "Success",
+            description: "Expense created successfully",
          });
          reset();
          setDate(new Date());
-         const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-         if (closeButton) closeButton.click();
+         onSuccess?.();
       },
-      onError: () => {
+      onError: (error: Error) => {
          toast({
             title: "Error",
-            description: "Failed to create expense. Please try again.",
+            description: error.message || "Failed to create expense",
             variant: "destructive",
          });
       }
@@ -90,22 +110,42 @@ export function ExpenseForm() {
    };
 
    return (
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-         <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+         <div className="space-y-2">
+            <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+               Amount
+            </label>
             <Input
+               id="amount"
                type="number"
-               placeholder="Amount"
-               step="0.01"
+               placeholder="0.00"
                {...register('amount', { valueAsNumber: true })}
+               className={cn(
+                  "text-lg",
+                  errors.amount && "border-red-500"
+               )}
             />
-            {errors.amount && <p className="text-red-500">{errors.amount.message}</p>}
+            {errors.amount && (
+               <p className="text-sm text-red-500">{errors.amount.message}</p>
+            )}
          </div>
 
-         <div className="grid grid-cols-6 gap-4">
-            <div className="col-span-2">
-               <Select onValueChange={(value) => setValue('categoryId', value)}>
-                  <SelectTrigger>
-                     <SelectValue placeholder="Select a category" />
+         <div className="grid gap-4">
+            <div className="space-y-2">
+               <label className="text-sm font-medium leading-none">
+                  Category
+               </label>
+               <Select
+                  onValueChange={(value) => {
+                     setValue('categoryId', value);
+                     clearErrors('categoryId');
+                  }}
+               >
+                  <SelectTrigger className={cn(
+                     "w-full",
+                     errors.categoryId && "border-red-500"
+                  )}>
+                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
                      {categories.map((category) => (
@@ -117,18 +157,31 @@ export function ExpenseForm() {
                                     style: { color: category.textColor }
                                  })}
                               </div>
-                              <span style={{ color: category.textColor }}>{category.name}</span>
+                              <span className="font-medium">{category.name}</span>
                            </div>
                         </SelectItem>
                      ))}
                   </SelectContent>
                </Select>
-               {errors.categoryId && <p className="text-red-500">{errors.categoryId.message}</p>}
+               {errors.categoryId && (
+                  <p className="text-sm text-red-500">{errors.categoryId.message}</p>
+               )}
             </div>
 
-            <div className="col-span-2">
-               <Select onValueChange={(value) => setValue('paymentMode', value)}>
-                  <SelectTrigger>
+            <div className="space-y-2">
+               <label className="text-sm font-medium leading-none">
+                  Payment Mode
+               </label>
+               <Select
+                  onValueChange={(value) => {
+                     setValue('paymentMode', value);
+                     clearErrors('paymentMode');
+                  }}
+               >
+                  <SelectTrigger className={cn(
+                     "w-full",
+                     errors.paymentMode && "border-red-500"
+                  )}>
                      <SelectValue placeholder="Select payment mode" />
                   </SelectTrigger>
                   <SelectContent>
@@ -139,23 +192,30 @@ export function ExpenseForm() {
                                  size: 16,
                                  className: "text-gray-600"
                               })}
-                              <span>{mode.name}</span>
+                              <span className="font-medium">{mode.name}</span>
                            </div>
                         </SelectItem>
                      ))}
                   </SelectContent>
                </Select>
-               {errors.paymentMode && <p className="text-red-500">{errors.paymentMode.message}</p>}
+               {errors.paymentMode && (
+                  <p className="text-sm text-red-500">{errors.paymentMode.message}</p>
+               )}
             </div>
 
-            <div className="col-span-2">
+            <div className="space-y-2">
+               <label className="text-sm font-medium leading-none">
+                  Date
+               </label>
                <Popover>
                   <PopoverTrigger asChild>
                      <Button
+                        type="button"
                         variant={"outline"}
                         className={cn(
                            "w-full justify-start text-left font-normal",
-                           !date && "text-muted-foreground"
+                           !date && "text-muted-foreground",
+                           errors.date && "border-red-500"
                         )}
                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -167,31 +227,39 @@ export function ExpenseForm() {
                         mode="single"
                         selected={date}
                         onSelect={(newDate) => {
-                           setDate(newDate);
+                           setDate(newDate || new Date());
                            setValue('date', newDate || new Date());
+                           if (newDate) clearErrors('date');
                         }}
                         initialFocus
                      />
                   </PopoverContent>
                </Popover>
-               {errors.date && <p className="text-red-500">{errors.date.message}</p>}
+               {errors.date && (
+                  <p className="text-sm text-red-500">{errors.date.message}</p>
+               )}
             </div>
          </div>
 
-         <div>
-            <Textarea
-               placeholder="Description (optional)"
-               className="resize-none"
-               {...register('description')}
-            />
-         </div>
-
-         <div className="flex justify-end gap-4 mt-6">
+         <div className="flex justify-end gap-3 pt-4 border-t">
             <DialogClose asChild>
-               <Button type="button" variant="outline">Cancel</Button>
+               <Button type="button" variant="outline">
+                  Cancel
+               </Button>
             </DialogClose>
-            <Button type="submit" disabled={mutation.isPending}>
-               {mutation.isPending ? 'Adding...' : 'Add Expense'}
+            <Button
+               type="submit"
+               disabled={mutation.isPending}
+               className="min-w-[120px]"
+            >
+               {mutation.isPending ? (
+                  <>
+                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                     Adding...
+                  </>
+               ) : (
+                  'Add Expense'
+               )}
             </Button>
          </div>
       </form>

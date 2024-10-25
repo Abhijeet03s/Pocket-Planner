@@ -11,24 +11,27 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { ExpenseForm } from "./ExpenseForm";
+import { useState } from "react";
 
 export function AddExpenseButton() {
+   const [open, setOpen] = useState(false);
+
    return (
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
          <DialogTrigger asChild>
             <Button className="gap-2">
                <Plus className="h-4 w-4" />
                Add Expense
             </Button>
          </DialogTrigger>
-         <DialogContent className="sm:max-w-[600px]">
+         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
                <DialogTitle>Add New Expense</DialogTitle>
-               <DialogDescription>
-                  Fill in the details below to add a new expense to your records.
+               <DialogDescription className="text-sm text-muted-foreground">
+                  Fill in the expense details below.
                </DialogDescription>
             </DialogHeader>
-            <ExpenseForm />
+            <ExpenseForm onSuccess={() => setOpen(false)} />
          </DialogContent>
       </Dialog>
    );
