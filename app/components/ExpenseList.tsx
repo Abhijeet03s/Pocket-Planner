@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
+import { ExpensePageSkeleton } from "@/app/components/ui/ExpensePageSkeleton";
 
 type Expense = {
    id: string;
@@ -56,7 +57,7 @@ export function ExpenseList() {
    });
 
    if (isLoading) {
-      return <div>Loading expenses...</div>;
+      return <ExpensePageSkeleton />;
    }
 
    if (isError) {
