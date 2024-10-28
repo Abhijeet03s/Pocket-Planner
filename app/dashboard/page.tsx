@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { ArrowUpRight, DollarSign, CreditCard, TrendingUp } from "lucide-react";
+import { SpendingPieChart } from "@/app/components/SpendingPieChart";
 
 export default function DashboardPage() {
    return (
@@ -68,10 +69,7 @@ export default function DashboardPage() {
             </Card>
          </div>
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="p-6">
-               <h2 className="text-xl font-semibold text-gray-900 mb-4">Spending Overview</h2>
-               {/* Add a chart or graph for spending overview here */}
-            </Card>
+            <SpendingPieChart />
          </div>
       </div>
    );

@@ -14,11 +14,11 @@ export async function POST(req: Request) {
 
       const expense = await prisma.expense.create({
          data: {
-            amount: amount,
+            amount,
             description: description || "",
             date: new Date(date),
-            categoryId: categoryId,
-            paymentMode: paymentMode,
+            categoryId,
+            paymentMode,
             userId: session.user.id,
          },
       });

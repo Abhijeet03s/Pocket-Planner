@@ -30,6 +30,7 @@ export default function Hero() {
                      width={1000}
                      height={562}
                      className="rounded-lg shadow-2xl w-full h-auto"
+                     priority
                   />
                </div>
             </div>
