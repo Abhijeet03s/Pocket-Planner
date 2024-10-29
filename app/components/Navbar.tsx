@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSession } from "next-auth/react";
 import { SignInButton } from "./SignInButton";
 import { Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { satoshi } from "@/app/fonts/font";
+import { useSessionWithCache } from "@/hooks/useSession";
 
 export default function Navbar() {
    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-   const { data: session } = useSession();
+   const { session } = useSessionWithCache();
 
    return (
       <header className={`bg-white shadow-sm sticky top-0 z-50 ${satoshi.variable}`}>
