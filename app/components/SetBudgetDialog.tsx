@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
    Dialog,
    DialogContent,
-   DialogDescription,
    DialogHeader,
    DialogTitle,
    DialogTrigger,
@@ -18,18 +17,18 @@ import { format } from 'date-fns';
 export function SetBudgetDialog() {
    const [open, setOpen] = useState(false);
    const [budget, setBudget] = useState('');
-   const [month, setMonth] = useState(format(new Date(), 'yyyy-MM'));
    const { toast } = useToast();
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
+         const currentMonth = format(new Date(), 'yyyy-MM');
          const response = await fetch('/api/budget', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                amount: parseFloat(budget),
-               month
+               month: currentMonth
             }),
          });
 
@@ -61,31 +60,25 @@ export function SetBudgetDialog() {
          <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
                <DialogTitle>Set Monthly Budget</DialogTitle>
-               <DialogDescription>
-                  Set your budget for the selected month.
-               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
                <div className="space-y-2">
-                  <label className="text-sm font-medium">Month</label>
-                  <Input
-                     type="month"
-                     value={month}
-                     onChange={(e) => setMonth(e.target.value)}
-                     required
-                  />
-               </div>
-               <div className="space-y-2">
-                  <label className="text-sm font-medium">Budget Amount</label>
-                  <Input
-                     type="number"
-                     value={budget}
-                     onChange={(e) => setBudget(e.target.value)}
-                     placeholder="Enter amount"
-                     required
-                     min="0"
-                     step="0.01"
-                  />
+                  <label className="text-sm font-medium">
+                     Budget Amount for {format(new Date(), 'MMMM yyyy')}
+                  </label>
+                  <div className="relative">
+                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                     <Input
+                        type="number"
+                        value={budget}
+                        onChange={(e) => setBudget(e.target.value)}
+                        placeholder="0.00"
+                        required
+                        min="0"
+                        step="0.01"
+                        className="pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     />
+                  </div>
                </div>
                <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={() => setOpen(false)}>
