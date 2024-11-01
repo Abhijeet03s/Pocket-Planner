@@ -44,6 +44,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   expenses      Expense[]
+  budgets       Budget[]
 }
 
 model Expense {
@@ -66,4 +67,16 @@ model Category {
   icon     String
   color    String
   expenses Expense[]
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  amount    Decimal  @db.Decimal(10, 2)
+  month     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, month])
 }

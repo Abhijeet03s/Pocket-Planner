@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
    const [year, monthNum] = month.split('-');
    const startDate = new Date(parseInt(year), parseInt(monthNum) - 1, 1);
-   const endDate = new Date(parseInt(year), parseInt(monthNum), 0);
+   const endDate = new Date(parseInt(year), parseInt(monthNum) + 1, 0);
 
    try {
       const spending = await prisma.expense.groupBy({

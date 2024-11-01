@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { format } from 'date-fns';
-import { Input } from '@/components/ui/input';
 import { categories } from '../../lib/constants';
 import { createElement } from 'react';
 import { paymentModes } from '@/lib/constants';
@@ -11,20 +9,25 @@ import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
 import { ExpensePageSkeleton } from "@/app/components/ui/ExpensePageSkeleton";
+import { DateRange } from "react-day-picker";
+import { Expense } from '@prisma/client';
 
-type Expense = {
-   id: string;
-   amount: string;
-   description: string | null;
-   date: string;
-   categoryId: string;
-   paymentMode: string;
-};
+interface ExpenseListProps {
+   dateRange: DateRange | undefined;
+}
 
-const fetchExpenses = async (startDate: string, endDate: string): Promise<Expense[]> => {
+const fetchExpenses = async (dateRange: DateRange | undefined): Promise<Expense[]> => {
    const queryParams = new URLSearchParams();
-   if (startDate) queryParams.append('startDate', startDate);
-   if (endDate) queryParams.append('endDate', endDate);
+   if (dateRange?.from) {
+      const startDate = new Date(dateRange.from);
+      startDate.setHours(0, 0, 0, 0);
+      queryParams.append('startDate', startDate.toISOString());
+   }
+   if (dateRange?.to) {
+      const endDate = new Date(dateRange.to);
+      endDate.setHours(23, 59, 59, 999);
+      queryParams.append('endDate', endDate.toISOString());
+   }
 
    const response = await fetch(`/api/expenses?${queryParams.toString()}`);
    if (!response.ok) {
@@ -45,15 +48,13 @@ const deleteExpense = async (id: string) => {
    throw new Error('Failed to delete expense');
 };
 
-export function ExpenseList() {
-   const [startDate, setStartDate] = useState('');
-   const [endDate, setEndDate] = useState('');
+export function ExpenseList({ dateRange }: ExpenseListProps) {
    const { toast } = useToast();
    const queryClient = useQueryClient();
 
    const { data: expenses = [], isLoading, isError } = useQuery({
-      queryKey: ['expenses', startDate, endDate],
-      queryFn: () => fetchExpenses(startDate, endDate),
+      queryKey: ['expenses', dateRange?.from, dateRange?.to],
+      queryFn: () => fetchExpenses(dateRange),
    });
 
    if (isLoading) {
@@ -97,33 +98,6 @@ export function ExpenseList() {
 
    return (
       <div className="space-y-6">
-         <div className="flex items-center gap-4 p-4 bg-white rounded-lg border">
-            <div className="flex flex-col gap-1">
-               <label htmlFor="startDate" className="text-sm font-medium text-gray-600">
-                  Start Date
-               </label>
-               <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-40"
-               />
-            </div>
-            <div className="flex flex-col gap-1">
-               <label htmlFor="endDate" className="text-sm font-medium text-gray-600">
-                  End Date
-               </label>
-               <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-40"
-               />
-            </div>
-         </div>
-
          <div className="bg-white rounded-lg border shadow-sm">
             <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 rounded-t-lg border-b">
                <div className="font-medium text-sm text-gray-600">Category</div>
@@ -157,7 +131,7 @@ export function ExpenseList() {
                            {getExpenseDescription(expense.description, category.name)}
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
-                           ${parseFloat(expense.amount).toFixed(2)}
+                           ${parseFloat(expense.amount.toString()).toFixed(2)}
                         </div>
                         <div className="text-sm text-gray-600">
                            {format(new Date(expense.date), 'MMM dd, yyyy')}
@@ -183,14 +157,14 @@ export function ExpenseList() {
          {expenses.length === 0 && (
             <div className="text-center py-12 bg-white rounded-lg border">
                <p className="text-gray-500 text-lg">
-                  {startDate || endDate ? (
+                  {dateRange ? (
                      "No expenses found for the selected period"
                   ) : (
                      "You haven't added any expenses yet"
                   )}
                </p>
                <p className="text-gray-400 text-sm mt-1">
-                  {startDate || endDate ? (
+                  {dateRange ? (
                      "Try adjusting your date range"
                   ) : (
                      "Click the 'Add Expense' button to get started"
