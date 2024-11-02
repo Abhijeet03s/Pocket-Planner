@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { SignInButton } from "./SignInButton";
 import { Menu } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { satoshi } from "@/app/fonts/font";
-import { useSessionWithCache } from "@/hooks/useSession";
+import { Button } from '@/app/components/ui/button';
+import { satoshi } from '@/app/fonts/font';
+import { useSessionWithCache } from '@/hooks/useSession';
 
 export default function Navbar() {
    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

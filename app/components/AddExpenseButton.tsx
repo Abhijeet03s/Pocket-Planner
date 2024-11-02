@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
    Dialog,
    DialogContent,
@@ -9,7 +9,7 @@ import {
    DialogHeader,
    DialogTitle,
    DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/app/components/ui/dialog";
 import { ExpenseForm } from "./ExpenseForm";
 import { useState } from "react";
 

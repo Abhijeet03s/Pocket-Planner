@@ -1,29 +1,31 @@
 import prisma from '@/lib/prisma';
-import { categories } from '@/lib/constants';
 
 export async function initializeCategories() {
    try {
       await prisma.$transaction(async (tx) => {
-         for (const category of categories) {
-            await tx.category.upsert({
-               where: { id: category.id },
-               update: {
-                  name: category.name,
-                  icon: category.icon.toString(),
-                  color: category.color,
-               },
-               create: {
-                  id: category.id,
-                  name: category.name,
-                  icon: category.icon.toString(),
-                  color: category.color,
-               },
-            });
+         const existingCategories = await tx.category.findMany();
+         if (existingCategories.length > 0) {
+            return;
          }
+
+         await tx.category.createMany({
+            data: [
+               { name: 'Food & Dining', icon: '🍔', color: '#FF5733' },
+               { name: 'Transportation', icon: '🚗', color: '#33FF57' },
+               { name: 'Shopping', icon: '🛍️', color: '#33A1FF' },
+               { name: 'Entertainment', icon: '🎥', color: '#FF33A1' },
+               { name: 'Bills & Utilities', icon: '💰', color: '#3333FF' },
+               { name: 'Healthcare', icon: '🏥', color: '#FF3333' },
+               { name: 'Education', icon: '🎓', color: '#33FF33' },
+               { name: 'Travel', icon: '🌍', color: '#3333FF' },
+               { name: 'Others', icon: '💸', color: '#FF3333' },
+            ],
+         });
       });
 
       console.log('Categories initialized successfully');
    } catch (error) {
-      console.error('Failed to initialize categories:', error);
+      console.error('Error initializing categories:', error);
+      throw error;
    }
 }

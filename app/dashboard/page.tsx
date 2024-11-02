@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "@/app/components/ui/card";
 import { ArrowUpRight, DollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { SpendingPieChart } from "@/app/components/SpendingPieChart";
 

@@ -1,12 +1,12 @@
 'use client'
 
-import { signIn, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import { useSessionWithCache } from "@/hooks/useSession"
+import { signIn, signOut } from 'next-auth/react';
+import { Button } from '@/app/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useSessionWithCache } from '@/hooks/useSession';
 
 export function SignInButton() {
-   const { session } = useSessionWithCache()
+   const { session } = useSessionWithCache();
    const router = useRouter()
 
    if (session && session.user) {

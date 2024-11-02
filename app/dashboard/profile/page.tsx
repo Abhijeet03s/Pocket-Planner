@@ -1,10 +1,10 @@
-import Image from "next/image";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
-import { redirect } from "next/navigation";
-import { Card } from "@/components/ui/card";
-import { HelpCircle } from "lucide-react";
-import { SignOutButton } from "@/app/components/SignOutButton";
+import Image from 'next/image';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
+import { redirect } from 'next/navigation';
+import { Card } from '@/app/components/ui/card';
+import { HelpCircle } from 'lucide-react';
+import { SignOutButton } from '@/app/components/SignOutButton';
 
 export default async function ProfilePage() {
    const session = await getServerSession(authOptions);

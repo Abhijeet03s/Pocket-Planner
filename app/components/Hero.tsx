@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import dummyDashboard from '../assets/dummy-dashboard.png';
-import { satoshi, clashDisplay } from "@/app/fonts/font";
+import { satoshi, clashDisplay } from '@/app/fonts/font';
 
 export default function Hero() {
    return (

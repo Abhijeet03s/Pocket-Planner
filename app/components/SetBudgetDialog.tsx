@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
    Dialog,
    DialogContent,
    DialogHeader,
    DialogTitle,
    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
 import { PiggyBank } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';

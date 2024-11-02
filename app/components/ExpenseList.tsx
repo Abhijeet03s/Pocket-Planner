@@ -5,10 +5,10 @@ import { categories } from '../../lib/constants';
 import { createElement } from 'react';
 import { paymentModes } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
-import { ExpensePageSkeleton } from "@/app/components/ui/ExpensePageSkeleton";
+import { ExpensePageSkeleton } from '@/app/components/ExpensePageSkeleton';
 import { DateRange } from "react-day-picker";
 import { Expense } from '@prisma/client';
 

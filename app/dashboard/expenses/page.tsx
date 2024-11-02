@@ -2,10 +2,10 @@
 
 import { AddExpenseButton } from "@/app/components/AddExpenseButton";
 import { ExpenseList } from "@/app/components/ExpenseList";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/app/components/ui/card";
 import { QueryClientProvider } from "@/app/providers/QueryClientProvider";
 import { Suspense } from "react";
-import { ExpensePageSkeleton } from "@/app/components/ui/ExpensePageSkeleton";
+import { ExpensePageSkeleton } from "@/app/components/ExpensePageSkeleton";
 import { SetBudgetDialog } from "@/app/components/SetBudgetDialog";
 import { MonthSelector } from "@/app/components/MonthSelector";
 import { useState } from "react";

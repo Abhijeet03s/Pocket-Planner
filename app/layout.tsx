@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "../app/components/SessionProvider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/app/components/ui/toaster";
 import { initializeCategories } from '@/lib/initializeDb';
 
 export const metadata: Metadata = {

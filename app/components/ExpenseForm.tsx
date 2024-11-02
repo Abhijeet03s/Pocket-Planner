@@ -6,16 +6,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Wallet, CreditCard, Smartphone, Laptop, Landmark, MoreHorizontal, Loader2 } from "lucide-react";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/components/ui/popover';
+import { Calendar } from '@/app/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { categories, paymentModes } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DialogClose } from "@/components/ui/dialog";
+import { DialogClose } from "@/app/components/ui/dialog";
 
 const expenseSchema = z.object({
    amount: z.number({
