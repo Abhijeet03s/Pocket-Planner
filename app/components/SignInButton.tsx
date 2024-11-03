@@ -24,7 +24,7 @@ export function SignInButton() {
                onClick={() => signOut()}
                className="bg-white text-purple-600 border-purple-600 hover:bg-purple-600 hover:text-white transition-colors duration-200"
             >
-               Sign out
+               Logout
             </Button>
          </div>
       )

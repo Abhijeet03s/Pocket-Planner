@@ -10,6 +10,7 @@ import { SetBudgetDialog } from "@/app/components/SetBudgetDialog";
 import { MonthSelector } from "@/app/components/MonthSelector";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { satoshi } from "@/app/fonts/font";
 
 export default function ExpensesPage() {
    const [date, setDate] = useState<DateRange | undefined>(() => {
@@ -22,7 +23,7 @@ export default function ExpensesPage() {
    return (
       <QueryClientProvider>
          <Suspense fallback={<ExpensePageSkeleton />}>
-            <div>
+            <div className={`${satoshi.variable} font-satoshi`}>
                <div className="flex justify-between items-center py-6">
                   <h1 className="text-3xl font-bold text-gray-900">Expense Management</h1>
                </div>

@@ -1,76 +1,140 @@
-import { Card } from "@/app/components/ui/card";
-import { ArrowUpRight, DollarSign, CreditCard, TrendingUp } from "lucide-react";
-import { SpendingPieChart } from "@/app/components/SpendingPieChart";
+'use client';
 
-export default function DashboardPage() {
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { Card } from "@/app/components/ui/card";
+import { Wallet, Receipt, PiggyBank, AlertCircle, TrendingDown, TrendingUp } from "lucide-react";
+import { QueryClientProvider } from "@/app/providers/QueryClientProvider";
+import { BudgetComparisonChart } from "@/app/components/BudgetComparisonChart";
+import { SpendingPieChart } from "@/app/components/SpendingPieChart";
+import { satoshi } from "@/app/fonts/font";
+
+function DashboardContent() {
+   const currentMonth = format(new Date(), 'yyyy-MM');
+
+   const { data: budget } = useQuery({
+      queryKey: ['budget', currentMonth],
+      queryFn: async () => {
+         const response = await fetch(`/api/budget?month=${currentMonth}`);
+         if (!response.ok) return null;
+         return response.json();
+      },
+   });
+
+   const { data: expenses } = useQuery({
+      queryKey: ['expenses', currentMonth],
+      queryFn: async () => {
+         const response = await fetch(`/api/expenses/summary?month=${currentMonth}`);
+         if (!response.ok) return [];
+         return response.json();
+      },
+   });
+
+   const totalExpenses = expenses?.reduce((sum: number, item: { total: number }) =>
+      sum + item.total, 0) || 0;
+   const budgetAmount = budget?.amount ? Number(budget.amount) : 0;
+   const remaining = Math.max(budgetAmount - totalExpenses, 0);
+
+   const budgetUsagePercentage = budgetAmount ? (totalExpenses / budgetAmount) * 100 : 0;
+   const isOverBudget = totalExpenses > budgetAmount;
+   const isNearBudget = budgetUsagePercentage >= 80 && !isOverBudget;
+
+   const getBudgetStatusInfo = () => {
+      if (isOverBudget) {
+         return {
+            icon: <AlertCircle className="w-4 h-4 mr-1" />,
+            text: `${(budgetUsagePercentage).toFixed(1)}% over budget`,
+            color: 'text-red-600'
+         };
+      }
+      if (isNearBudget) {
+         return {
+            icon: <TrendingUp className="w-4 h-4 mr-1" />,
+            text: `${budgetUsagePercentage.toFixed(1)}% of budget used`,
+            color: 'text-yellow-600'
+         };
+      }
+      return {
+         icon: <TrendingDown className="w-4 h-4 mr-1" />,
+         text: `${budgetUsagePercentage.toFixed(1)}% of budget used`,
+         color: 'text-green-600'
+      };
+   };
+
+   const budgetStatus = getBudgetStatusInfo();
+
    return (
-      <div>
-         <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className={`${satoshi.variable} font-satoshi`}>
+         <div className="flex justify-between items-center py-6">
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card className="p-6">
                <div className="flex items-center justify-between">
                   <div>
-                     <p className="text-sm font-medium text-gray-600">Total Balance</p>
-                     <p className="text-2xl font-semibold text-gray-900">$24,500.00</p>
+                     <p className="text-sm font-medium text-gray-600">Monthly Budget</p>
+                     <p className="text-2xl font-semibold text-gray-900">₹{budgetAmount.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                     <DollarSign className="w-6 h-6 text-green-600" />
+                  <div className="p-3 bg-purple-100 rounded-full">
+                     <Wallet className="w-6 h-6 text-purple-600" />
                   </div>
                </div>
-               <div className="mt-4 flex items-center text-sm text-green-600">
-                  <ArrowUpRight className="w-4 h-4 mr-1" />
-                  <span>3.5% from last month</span>
+               <div className={`mt-4 flex items-center text-sm ${budgetStatus.color}`}>
+                  {budgetStatus.icon}
+                  <span>₹{remaining.toLocaleString()} remaining</span>
                </div>
             </Card>
+
             <Card className="p-6">
                <div className="flex items-center justify-between">
                   <div>
                      <p className="text-sm font-medium text-gray-600">Total Expenses</p>
-                     <p className="text-2xl font-semibold text-gray-900">$12,750.00</p>
-                  </div>
-                  <div className="p-3 bg-red-100 rounded-full">
-                     <CreditCard className="w-6 h-6 text-red-600" />
-                  </div>
-               </div>
-               <div className="mt-4 flex items-center text-sm text-red-600">
-                  <ArrowUpRight className="w-4 h-4 mr-1" />
-                  <span>2.1% from last month</span>
-               </div>
-            </Card>
-            <Card className="p-6">
-               <div className="flex items-center justify-between">
-                  <div>
-                     <p className="text-sm font-medium text-gray-600">Total Savings</p>
-                     <p className="text-2xl font-semibold text-gray-900">$11,750.00</p>
+                     <p className="text-2xl font-semibold text-gray-900">₹{totalExpenses.toLocaleString()}</p>
                   </div>
                   <div className="p-3 bg-blue-100 rounded-full">
-                     <TrendingUp className="w-6 h-6 text-blue-600" />
+                     <Receipt className="w-6 h-6 text-blue-600" />
                   </div>
                </div>
-               <div className="mt-4 flex items-center text-sm text-blue-600">
-                  <ArrowUpRight className="w-4 h-4 mr-1" />
-                  <span>5.2% from last month</span>
+               <div className={`mt-4 flex items-center text-sm ${budgetStatus.color}`}>
+                  {budgetStatus.icon}
+                  <span>{budgetStatus.text}</span>
                </div>
             </Card>
+
             <Card className="p-6">
                <div className="flex items-center justify-between">
                   <div>
                      <p className="text-sm font-medium text-gray-600">Budget Left</p>
-                     <p className="text-2xl font-semibold text-gray-900">$8,250.00</p>
+                     <p className="text-2xl font-semibold text-gray-900">₹{remaining.toLocaleString()}</p>
                   </div>
-                  <div className="p-3 bg-yellow-100 rounded-full">
-                     <DollarSign className="w-6 h-6 text-yellow-600" />
+                  <div className="p-3 bg-emerald-100 rounded-full">
+                     <PiggyBank className="w-6 h-6 text-emerald-600" />
                   </div>
                </div>
-               <div className="mt-4 flex items-center text-sm text-yellow-600">
-                  <ArrowUpRight className="w-4 h-4 mr-1" />
-                  <span>1.8% from last month</span>
+               <div className={`mt-4 flex items-center text-sm ${isOverBudget ? 'text-red-600' : isNearBudget ? 'text-yellow-600' : 'text-green-600'}`}>
+                  {isOverBudget ? <AlertCircle className="w-4 h-4 mr-1" /> :
+                     isNearBudget ? <TrendingUp className="w-4 h-4 mr-1" /> :
+                        <TrendingDown className="w-4 h-4 mr-1" />}
+                  <span>{isOverBudget ? 'Over budget' :
+                     isNearBudget ? 'Near budget limit' :
+                        `${((remaining / budgetAmount) * 100).toFixed(1)}% remaining`}</span>
                </div>
             </Card>
          </div>
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <BudgetComparisonChart selectedDate={new Date()} />
             <SpendingPieChart />
          </div>
       </div>
+   );
+}
+
+export default function DashboardPage() {
+   return (
+      <QueryClientProvider>
+         <DashboardContent />
+      </QueryClientProvider>
    );
 }

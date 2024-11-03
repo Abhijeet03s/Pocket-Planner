@@ -1,159 +1,171 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Card } from "@/app/components/ui/card";
 import { PieChart, Pie, Legend, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { categories } from '@/lib/constants';
+import { useQuery } from '@tanstack/react-query';
+import { Loader } from "@/app/components/ui/loader";
 
-type SpendingSummary = {
+interface ExpenseData {
    categoryId: string;
    total: number;
 }
 
-const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: { cx: number, cy: number, midAngle: number, innerRadius: number, outerRadius: number, percent: number }) => {
-   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-   const x = cx + radius * Math.cos(-midAngle * RADIAN);
-   const y = cy + radius * Math.sin(-midAngle * RADIAN);
+interface ChartData {
+   name: string;
+   value: number;
+   fill: string;
+   category: string;
+}
 
-   return percent > 0.05 ? (
-      <text
-         x={x}
-         y={y}
-         fill="white"
-         textAnchor="middle"
-         dominantBaseline="central"
-      >
-         {`${(percent * 100).toFixed(0)}%`}
-      </text>
-   ) : null;
-};
+interface CustomTooltipProps {
+   active?: boolean;
+   payload?: Array<{ payload: ChartData }>;
+}
 
-const CustomTooltip = ({ active, payload }: { active: boolean, payload: any }) => {
-   if (active && payload && payload.length) {
-      const category = categories.find(cat => cat.id === payload[0].name);
-      return (
-         <div className="bg-white p-4 rounded-lg shadow-lg border">
-            <p className="font-medium" style={{ color: payload[0].payload.fill }}>
-               {category?.name || payload[0].name}
-            </p>
-            <p className="text-gray-600">
-               ${payload[0].value.toLocaleString()}
-            </p>
-         </div>
-      );
-   }
-   return null;
-};
+interface CustomLabelProps {
+   cx: number;
+   cy: number;
+   midAngle: number;
+   innerRadius: number;
+   outerRadius: number;
+   percent: number;
+}
 
 export function SpendingPieChart() {
-   const [data, setData] = useState<SpendingSummary[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
-   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+   const currentMonth = format(new Date(), 'yyyy-MM');
+   const displayMonth = format(new Date(), 'MMMM yyyy');
 
-   useEffect(() => {
-      const currentDate = new Date();
-      const monthString = format(currentDate, 'yyyy-MM');
-
-      fetch(`/api/expenses/summary?month=${monthString}`)
-         .then(res => res.json())
-         .then(summaryData => {
-            setData(summaryData);
-            setIsLoading(false);
-         })
-         .catch(error => {
-            console.error('Failed to fetch spending summary:', error);
-            setIsLoading(false);
+   const { data, isLoading } = useQuery<ExpenseData[], Error, ChartData[]>({
+      queryKey: ['spending-summary', currentMonth],
+      queryFn: async () => {
+         const response = await fetch(`/api/expenses/summary?month=${currentMonth}`);
+         if (!response.ok) return [];
+         return response.json();
+      },
+      select: (summaryData) => {
+         return summaryData.map((item) => {
+            const category = categories.find(cat => cat.id === item.categoryId);
+            return {
+               name: category?.id || 'unknown',
+               value: item.total,
+               fill: category?.textColor || '#666',
+               category: category?.name || 'Unknown'
+            };
          });
-   }, []);
-
-   const chartData = data.map(item => {
-      const category = categories.find(cat => cat.id === item.categoryId);
-      return {
-         name: category?.id || 'unknown',
-         value: item.total,
-         fill: category?.textColor || '#666',
-      };
+      }
    });
 
-   const onPieEnter = (index: number) => {
-      setActiveIndex(index);
+   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+      if (!active || !payload?.length) return null;
+      const data = payload[0].payload;
+      const total = payload.reduce((sum, entry) => sum + entry.payload.value, 0);
+      const percentage = (data.value / total) * 100;
+
+      return (
+         <div className="bg-white p-3 rounded-lg shadow-md border min-w-[200px]">
+            <p className="font-semibold text-base mb-1.5" style={{ color: data.fill }}>
+               {data.category}
+            </p>
+            <div className="space-y-1.5 text-sm">
+               <div className="flex justify-between gap-3">
+                  <span className="text-gray-500">Amount:</span>
+                  <span className="font-medium">₹{data.value.toLocaleString()}</span>
+               </div>
+               <div className="flex justify-between gap-3">
+                  <span className="text-gray-500">Percentage:</span>
+                  <span className="font-medium">{percentage.toFixed(1)}%</span>
+               </div>
+            </div>
+         </div>
+      );
    };
 
-   const onPieLeave = () => {
-      setActiveIndex(null);
+   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: CustomLabelProps) => {
+      const RADIAN = Math.PI / 180;
+      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+      return percent > 0.05 ? (
+         <text
+            x={x}
+            y={y}
+            fill="white"
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="text-xs font-medium"
+         >
+            {`${(percent * 100).toFixed(0)}%`}
+         </text>
+      ) : null;
    };
 
    if (isLoading) {
       return (
-         <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl shadow-sm">
-            <div className="animate-pulse text-gray-400">Loading...</div>
-         </div>
-      );
-   }
-
-   if (chartData.length === 0) {
-      return (
-         <div className="w-full h-[400px] flex items-center justify-center bg-white rounded-xl shadow-sm">
-            <p className="text-gray-400">No spending data for this month</p>
-         </div>
+         <Card className="w-full h-[400px]">
+            <Loader color="blue" />
+         </Card>
       );
    }
 
    return (
-      <div className="w-full h-[400px] bg-white rounded-xl shadow-sm p-4">
-         <h2 className="text-xl font-semibold text-center mb-4">Spending Overview</h2>
-         <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-               <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  innerRadius={80}
-                  outerRadius={140}
-                  paddingAngle={2}
-                  dataKey="value"
-                  onMouseEnter={onPieEnter}
-                  onMouseLeave={onPieLeave}
-                  animationBegin={0}
-                  animationDuration={1000}
-               >
-                  {chartData.map((entry, index) => (
-                     <Cell
-                        key={`cell-${index}`}
-                        fill={entry.fill}
-                        opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
-                        stroke="white"
-                        strokeWidth={2}
+      <Card className="w-full h-[400px]">
+         <div className="p-6 h-full">
+            <div className="flex items-center justify-between mb-4">
+               <div>
+                  <h2 className="text-xl font-semibold">Spending Overview</h2>
+                  <p className="text-sm text-gray-500 mt-1">{displayMonth}</p>
+               </div>
+            </div>
+
+            <div className="h-[300px]">
+               <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                     <Pie
+                        data={data}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        innerRadius={80}
+                        outerRadius={140}
+                        paddingAngle={2}
+                        dataKey="value"
+                     >
+                        {data?.map((entry: ChartData, index: number) => (
+                           <Cell
+                              key={`cell-${index}`}
+                              fill={entry.fill}
+                              stroke="white"
+                              strokeWidth={2}
+                           />
+                        ))}
+                     </Pie>
+                     <Tooltip content={<CustomTooltip active={true} payload={[]} />} />
+                     <Legend
+                        align="right"
+                        verticalAlign="middle"
+                        layout="vertical"
+                        iconType="circle"
+                        iconSize={10}
+                        formatter={(value) => {
+                           const category = categories.find(cat => cat.id === value);
+                           return (
+                              <span className="text-sm text-gray-600">
+                                 {category?.name || value}
+                              </span>
+                           );
+                        }}
+                        wrapperStyle={{
+                           paddingLeft: '20px',
+                        }}
                      />
-                  ))}
-               </Pie>
-               <Tooltip content={<CustomTooltip active={true} payload={[]} />} />
-               <Legend
-                  align="right"
-                  verticalAlign="middle"
-                  layout="vertical"
-                  formatter={(value) => {
-                     const category = categories.find(cat => cat.id === value);
-                     const item = chartData.find(d => d.name === value);
-                     return (
-                        <span className="text-sm">
-                           {category?.name || value}
-                           <span className="ml-2 text-gray-500">
-                              ${item?.value.toLocaleString()}
-                           </span>
-                        </span>
-                     );
-                  }}
-                  wrapperStyle={{
-                     paddingLeft: '20px',
-                  }}
-               />
-            </PieChart>
-         </ResponsiveContainer>
-      </div>
+                  </PieChart>
+               </ResponsiveContainer>
+            </div>
+         </div>
+      </Card>
    );
 }

@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ExpensePageSkeleton } from '@/app/components/ExpensePageSkeleton';
 import { DateRange } from "react-day-picker";
 import { Expense } from '@prisma/client';
+import { BudgetIndicator } from '@/app/components/BudgetIndicator';
 
 interface ExpenseListProps {
    dateRange: DateRange | undefined;
@@ -96,8 +97,16 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
       }
    };
 
+   const calculateTotalExpenses = () => {
+      return expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+   };
+
+   const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
+   const totalExpenses = calculateTotalExpenses();
+
    return (
       <div className="space-y-6">
+         <BudgetIndicator month={currentMonth} totalExpenses={totalExpenses} />
          <div className="bg-white rounded-lg border shadow-sm">
             <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 rounded-t-lg border-b">
                <div className="font-medium text-sm text-gray-600">Category</div>

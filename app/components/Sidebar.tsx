@@ -3,15 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, DollarSign, User, Settings, PanelRightOpen } from "lucide-react";
+import { PanelRightOpen } from "lucide-react";
 import { useState } from "react";
-
-const links = [
-   { href: "/dashboard", label: "Dashboard", icon: Home },
-   { href: "/dashboard/expenses", label: "Expenses", icon: DollarSign },
-   { href: "/dashboard/profile", label: "Profile", icon: User },
-   { href: "/dashboard/settings", label: "Settings", icon: Settings },
-];
+import { satoshi } from "@/app/fonts/font";
+import { links } from "@/lib/constants";
 
 export function Sidebar() {
    const pathname = usePathname();
@@ -20,6 +15,7 @@ export function Sidebar() {
    return (
       <div
          className={cn(
+            `${satoshi.variable} font-satoshi`,
             "flex flex-col bg-gray-900 text-gray-100 transition-all duration-300 ease-in-out",
             collapsed ? "w-20" : "w-64"
          )}
