@@ -14,19 +14,21 @@ import { PiggyBank } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { DateRange } from "react-day-picker";
 
 interface SetBudgetDialogProps {
-   selectedMonth?: Date;
+   dateRange: DateRange | undefined;
 }
 
-export function SetBudgetDialog({ selectedMonth }: SetBudgetDialogProps) {
+export function SetBudgetDialog({ dateRange }: SetBudgetDialogProps) {
    const [open, setOpen] = useState(false);
    const [budget, setBudget] = useState('');
+   const [isSubmitting, setIsSubmitting] = useState(false);
    const { toast } = useToast();
    const queryClient = useQueryClient();
 
-   const currentMonth = selectedMonth ? format(selectedMonth, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
-   const displayMonth = selectedMonth ? format(selectedMonth, 'MMMM yyyy') : format(new Date(), 'MMMM yyyy');
+   const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
+   const displayMonth = dateRange?.from ? format(dateRange.from, 'MMMM yyyy') : format(new Date(), 'MMMM yyyy');
 
    // Fetch existing budget
    const { data: existingBudget } = useQuery({
@@ -50,6 +52,7 @@ export function SetBudgetDialog({ selectedMonth }: SetBudgetDialogProps) {
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setIsSubmitting(true);
       try {
          const response = await fetch('/api/budget', {
             method: 'POST',
@@ -78,6 +81,39 @@ export function SetBudgetDialog({ selectedMonth }: SetBudgetDialogProps) {
             description: "Failed to set budget",
             variant: "destructive",
          });
+      } finally {
+         setIsSubmitting(false);
+      }
+   };
+
+   const handleReset = async () => {
+      try {
+         const response = await fetch('/api/budget', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+               amount: 0,
+               month: currentMonth
+            }),
+         });
+
+         if (!response.ok) throw new Error('Failed to reset budget');
+
+         await queryClient.invalidateQueries({ queryKey: ['budget'] });
+         await queryClient.invalidateQueries({ queryKey: ['budget-comparison'] });
+
+         toast({
+            title: "Success",
+            description: `Budget for ${displayMonth} has been reset successfully`,
+         });
+         setOpen(false);
+      } catch (error) {
+         console.error('Failed to reset budget:', error);
+         toast({
+            title: "Error",
+            description: "Failed to reset budget",
+            variant: "destructive",
+         });
       }
    };
 
@@ -86,13 +122,13 @@ export function SetBudgetDialog({ selectedMonth }: SetBudgetDialogProps) {
          <DialogTrigger asChild>
             <Button variant="outline" className="gap-2">
                <PiggyBank className="h-4 w-4" />
-               {existingBudget ? 'Edit' : 'Set'} Budget
+               {isSubmitting ? 'Loading...' : existingBudget?.amount > 0 ? 'Edit Budget' : 'Set Budget'}
             </Button>
          </DialogTrigger>
          <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
                <DialogTitle>
-                  {existingBudget ? 'Edit' : 'Set'} Monthly Budget
+                  {existingBudget?.amount > 0 ? 'Edit' : 'Set'} Monthly Budget
                </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,13 +150,25 @@ export function SetBudgetDialog({ selectedMonth }: SetBudgetDialogProps) {
                      />
                   </div>
                </div>
-               <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                     Cancel
-                  </Button>
-                  <Button type="submit">
-                     {existingBudget ? 'Update' : 'Save'} Budget
-                  </Button>
+               <div className="flex justify-between items-center">
+                  {existingBudget?.amount > 0 && (
+                     <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={handleReset}
+                        className="gap-2"
+                     >
+                        Reset Budget
+                     </Button>
+                  )}
+                  <div className="flex gap-2 ml-auto">
+                     <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                        Cancel
+                     </Button>
+                     <Button type="submit">
+                        {existingBudget?.amount > 0 ? 'Update' : 'Save'} Budget
+                     </Button>
+                  </div>
                </div>
             </form>
          </DialogContent>

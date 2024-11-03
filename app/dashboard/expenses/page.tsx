@@ -30,7 +30,7 @@ export default function ExpensesPage() {
                <Card className="p-6">
                   <div className="flex justify-between items-center mb-6">
                      <div className="flex gap-2">
-                        <SetBudgetDialog />
+                        <SetBudgetDialog dateRange={date} />
                         <MonthSelector
                            date={date}
                            onDateChange={setDate}
