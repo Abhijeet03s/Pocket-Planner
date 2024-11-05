@@ -6,32 +6,7 @@ import { format } from 'date-fns';
 import { categories } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from "@/app/components/ui/loader";
-
-interface ExpenseData {
-   categoryId: string;
-   total: number;
-}
-
-interface ChartData {
-   name: string;
-   value: number;
-   fill: string;
-   category: string;
-}
-
-interface CustomTooltipProps {
-   active?: boolean;
-   payload?: Array<{ payload: ChartData }>;
-}
-
-interface CustomLabelProps {
-   cx: number;
-   cy: number;
-   midAngle: number;
-   innerRadius: number;
-   outerRadius: number;
-   percent: number;
-}
+import { ExpenseData, ChartData, CustomTooltipProps, CustomLabelProps } from "@/lib/types"
 
 export function SpendingPieChart() {
    const currentMonth = format(new Date(), 'yyyy-MM');
@@ -57,11 +32,13 @@ export function SpendingPieChart() {
       }
    });
 
+   const totalSpending = data?.reduce((sum, item) => sum + item.value, 0) || 0;
+
    const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
       if (!active || !payload?.length) return null;
       const data = payload[0].payload;
-      const total = payload.reduce((sum, entry) => sum + entry.payload.value, 0);
-      const percentage = (data.value / total) * 100;
+
+      const percentage = totalSpending > 0 ? (data.value / totalSpending) * 100 : 0;
 
       return (
          <div className="bg-white p-3 rounded-lg shadow-md border min-w-[200px]">
