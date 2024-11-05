@@ -32,19 +32,19 @@ export function BudgetIndicator({ month, totalExpenses }: BudgetIndicatorProps) 
          <div className="flex justify-between items-center mb-2">
             <h3 className="font-medium">Budget Status for {format(new Date(month), 'MMMM yyyy')}</h3>
             <span className={`font-medium ${isOverBudget ? 'text-red-600' : 'text-green-600'}`}>
-               ${remaining.toLocaleString()} remaining
+               ₹{remaining.toLocaleString()} remaining
             </span>
          </div>
          <Progress value={percentage} className="h-2"
             indicatorClassName={isOverBudget ? 'bg-red-600' : 'bg-green-600'}
          />
          <div className="mt-2 text-sm text-gray-600">
-            <span>${totalExpenses.toLocaleString()}</span>
+            <span>₹{totalExpenses.toLocaleString()}</span>
             <span className="mx-1">/</span>
-            <span>${budgetAmount.toLocaleString()}</span>
+            <span>₹{budgetAmount.toLocaleString()}</span>
             {isOverBudget && (
                <span className="text-red-600 ml-2">
-                  (${(totalExpenses - budgetAmount).toLocaleString()} over budget)
+                  (₹{(totalExpenses - budgetAmount).toLocaleString()} over budget)
                </span>
             )}
          </div>

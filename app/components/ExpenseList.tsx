@@ -140,7 +140,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                            {getExpenseDescription(expense.description, category.name)}
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
-                           ${parseFloat(expense.amount.toString()).toFixed(2)}
+                           ₹{parseFloat(expense.amount.toString()).toFixed(2)}
                         </div>
                         <div className="text-sm text-gray-600">
                            {format(new Date(expense.date), 'MMM dd, yyyy')}

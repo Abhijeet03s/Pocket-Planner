@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 
       const result = spending.map((item) => ({
          categoryId: item.categoryId,
-         total: Number(item._sum.amount) || 0,
+         total: item._sum.amount ? Number(item._sum.amount.toString()) : 0,
       }));
 
       return NextResponse.json(result);

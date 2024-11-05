@@ -2,26 +2,11 @@
 
 import { Card } from "@/app/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, subMonths } from 'date-fns';
-import { useQuery } from '@tanstack/react-query';
-import { Loader } from "@/app/components/ui/loader";
-
-interface BudgetComparisonChartProps {
-   selectedDate?: Date;
-}
 
 interface ChartData {
    month: string;
    spending: number;
    remaining: number;
-   total: number;
-}
-
-interface BudgetData {
-   amount: number;
-}
-
-interface ExpenseData {
    total: number;
 }
 
@@ -33,82 +18,15 @@ interface CustomTooltipProps {
    }>;
 }
 
-export function BudgetComparisonChart({ selectedDate }: BudgetComparisonChartProps) {
-   const currentDate = selectedDate || new Date();
-
-   const { data: chartData, isLoading } = useQuery<ChartData[]>({
-      queryKey: ['budget-comparison', 'budget', format(currentDate, 'yyyy-MM')],
-      queryFn: async () => {
-         const months = Array.from({ length: 6 }, (_, i) => {
-            const date = subMonths(currentDate, 5 - i);
-            return format(date, 'yyyy-MM');
-         });
-
-         const comparisonData = await Promise.all(
-            months.map(async (month) => {
-               try {
-                  const [budgetResponse, spendingResponse] = await Promise.all([
-                     fetch(`/api/budget?month=${month}`),
-                     fetch(`/api/expenses/summary?month=${month}`)
-                  ]);
-
-                  if (!spendingResponse.ok) {
-                     const budgetData: BudgetData = await budgetResponse.json();
-                     return {
-                        month: format(new Date(month), 'MMM'),
-                        spending: 0,
-                        remaining: Number(budgetData?.amount || 0),
-                        total: Number(budgetData?.amount || 0)
-                     };
-                  }
-
-                  if (budgetResponse.status === 404) {
-                     return {
-                        month: format(new Date(month), 'MMM'),
-                        spending: 0,
-                        remaining: 0,
-                        total: 0
-                     };
-                  }
-
-                  const budgetData: BudgetData = await budgetResponse.json();
-                  const spendingData: ExpenseData[] = await spendingResponse.json();
-
-                  const totalSpending = spendingData.reduce((sum, item) =>
-                     sum + item.total, 0);
-                  const budget = Number(budgetData?.amount || 0);
-                  const remaining = Math.max(0, budget - totalSpending);
-
-                  return {
-                     month: format(new Date(month), 'MMM'),
-                     spending: totalSpending,
-                     remaining: remaining,
-                     total: budget
-                  };
-               } catch (error) {
-                  console.error(`Error fetching data for ${month}:`, error);
-                  return {
-                     month: format(new Date(month), 'MMM'),
-                     spending: 0,
-                     remaining: 0,
-                     total: 0
-                  };
-               }
-            })
-         );
-
-         return comparisonData;
-      },
-      staleTime: 1 * 60 * 1000,
-   });
-
-   if (isLoading) {
-      return (
-         <Card className="w-full h-[400px]">
-            <Loader color="emerald" />
-         </Card>
-      );
-   }
+export function BudgetComparisonChart() {
+   const chartData: ChartData[] = [
+      { month: 'Jun', spending: 1500, remaining: 1000, total: 2500 },
+      { month: 'Jul', spending: 2000, remaining: 500, total: 2500 },
+      { month: 'Aug', spending: 2200, remaining: 300, total: 2500 },
+      { month: 'Sep', spending: 1800, remaining: 700, total: 2500 },
+      { month: 'Oct', spending: 2400, remaining: 100, total: 2500 },
+      { month: 'Nov', spending: 1500, remaining: 1000, total: 2500 },
+   ];
 
    const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
       if (!active || !payload?.length) return null;
@@ -159,51 +77,45 @@ export function BudgetComparisonChart({ selectedDate }: BudgetComparisonChartPro
             </div>
 
             <div className="h-[300px]">
-               {chartData && chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                     <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
-                        <XAxis
-                           dataKey="month"
-                           axisLine={true}
-                           tickLine={true}
-                           fontSize={12}
-                           tick={{ fill: '#666' }}
-                        />
-                        <YAxis
-                           axisLine={true}
-                           tickLine={true}
-                           fontSize={12}
-                           tick={{ fill: '#666' }}
-                           tickFormatter={(value) => `₹${value.toLocaleString()}`}
-                        />
-                        <Tooltip
-                           content={<CustomTooltip />}
-                           cursor={false}
-                        />
-                        <Bar
-                           dataKey="spending"
-                           stackId="a"
-                           fill="#3b82f6"
-                           radius={[0, 0, 0, 0]}
-                           maxBarSize={40}
-                           opacity={0.8}
-                        />
-                        <Bar
-                           dataKey="remaining"
-                           stackId="a"
-                           fill="#10b981"
-                           radius={[4, 4, 0, 0]}
-                           maxBarSize={40}
-                           opacity={0.8}
-                        />
-                     </BarChart>
-                  </ResponsiveContainer>
-               ) : (
-                  <div className="h-full flex items-center justify-center">
-                     <p className="text-sm text-gray-500">No data available</p>
-                  </div>
-               )}
+               <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
+                     <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                     <XAxis
+                        dataKey="month"
+                        axisLine={true}
+                        tickLine={true}
+                        fontSize={12}
+                        tick={{ fill: '#666' }}
+                     />
+                     <YAxis
+                        axisLine={true}
+                        tickLine={true}
+                        fontSize={12}
+                        tick={{ fill: '#666' }}
+                        tickFormatter={(value) => `₹${value.toLocaleString()}`}
+                     />
+                     <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={false}
+                     />
+                     <Bar
+                        dataKey="spending"
+                        stackId="a"
+                        fill="#3b82f6"
+                        radius={[0, 0, 0, 0]}
+                        maxBarSize={40}
+                        opacity={0.8}
+                     />
+                     <Bar
+                        dataKey="remaining"
+                        stackId="a"
+                        fill="#10b981"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={40}
+                        opacity={0.8}
+                     />
+                  </BarChart>
+               </ResponsiveContainer>
             </div>
          </div>
       </Card>

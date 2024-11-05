@@ -30,7 +30,6 @@ export function SetBudgetDialog({ dateRange }: SetBudgetDialogProps) {
    const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
    const displayMonth = dateRange?.from ? format(dateRange.from, 'MMMM yyyy') : format(new Date(), 'MMMM yyyy');
 
-   // Fetch existing budget
    const { data: existingBudget } = useQuery({
       queryKey: ['budget', currentMonth],
       queryFn: async () => {
@@ -41,7 +40,6 @@ export function SetBudgetDialog({ dateRange }: SetBudgetDialogProps) {
       },
    });
 
-   // Set initial budget value when dialog opens or month changes
    useEffect(() => {
       if (existingBudget?.amount) {
          setBudget(existingBudget.amount.toString());
@@ -65,7 +63,6 @@ export function SetBudgetDialog({ dateRange }: SetBudgetDialogProps) {
 
          if (!response.ok) throw new Error('Failed to set budget');
 
-         // Invalidate queries to refresh the data
          await queryClient.invalidateQueries({ queryKey: ['budget'] });
          await queryClient.invalidateQueries({ queryKey: ['budget-comparison'] });
 

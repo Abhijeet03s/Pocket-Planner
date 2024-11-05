@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Wallet, CreditCard, Smartphone, Laptop, Landmark, MoreHorizontal, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { categories, paymentModes } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DialogClose } from "@/app/components/ui/dialog";
+import { paymentIcons } from "@/lib/types";
 
 const expenseSchema = z.object({
    amount: z.number({
@@ -36,15 +37,6 @@ const expenseSchema = z.object({
 });
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
-
-const paymentIcons = {
-   'wallet': Wallet,
-   'credit-card': CreditCard,
-   'smartphone': Smartphone,
-   'laptop': Laptop,
-   'building-bank': Landmark,
-   'more-horizontal': MoreHorizontal,
-};
 
 type ExpenseFormProps = {
    onSuccess?: () => void;
