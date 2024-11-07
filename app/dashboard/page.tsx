@@ -30,8 +30,11 @@ function DashboardContent() {
       },
    });
 
-   const totalExpenses = expenses?.reduce((sum: number, item: { total: number }) =>
-      sum + item.total, 0) || 0;
+   const totalExpenses = expenses?.reduce((sum: number, item: { total: number | string }) => {
+      const itemTotal = typeof item.total === 'string' ? parseFloat(item.total) : item.total;
+      return sum + (isNaN(itemTotal) ? 0 : itemTotal);
+   }, 0) || 0;
+
    const budgetAmount = budget?.amount ? Number(budget.amount) : 0;
    const remaining = Math.max(budgetAmount - totalExpenses, 0);
 

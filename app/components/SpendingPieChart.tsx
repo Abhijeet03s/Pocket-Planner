@@ -6,13 +6,13 @@ import { format } from 'date-fns';
 import { categories } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from "@/app/components/ui/loader";
-import { ExpenseData, ChartData, CustomTooltipProps, CustomLabelProps } from "@/lib/types"
+import { ExpenseData, SpendingPieChartTooltipProps, SpendingPieChartData, CustomLabelProps } from "@/lib/types"
 
 export function SpendingPieChart() {
    const currentMonth = format(new Date(), 'yyyy-MM');
    const displayMonth = format(new Date(), 'MMMM yyyy');
 
-   const { data, isLoading } = useQuery<ExpenseData[], Error, ChartData[]>({
+   const { data, isLoading } = useQuery<ExpenseData[], Error, SpendingPieChartData[]>({
       queryKey: ['spending-summary', currentMonth],
       queryFn: async () => {
          const response = await fetch(`/api/expenses/summary?month=${currentMonth}`);
@@ -34,7 +34,7 @@ export function SpendingPieChart() {
 
    const totalSpending = data?.reduce((sum, item) => sum + item.value, 0) || 0;
 
-   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+   const CustomTooltip = ({ active, payload }: SpendingPieChartTooltipProps) => {
       if (!active || !payload?.length) return null;
       const data = payload[0].payload;
 
@@ -111,7 +111,7 @@ export function SpendingPieChart() {
                         paddingAngle={2}
                         dataKey="value"
                      >
-                        {data?.map((entry: ChartData, index: number) => (
+                        {data?.map((entry: SpendingPieChartData, index: number) => (
                            <Cell
                               key={`cell-${index}`}
                               fill={entry.fill}
