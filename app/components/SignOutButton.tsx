@@ -9,7 +9,7 @@ export function SignOutButton() {
       <Button
          variant="outline"
          onClick={() => signOut()}
-         className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+         className="text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700"
       >
          <LogOut className="w-4 h-4 mr-2" />
          Logout

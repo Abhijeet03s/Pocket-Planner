@@ -5,6 +5,32 @@ import { redirect } from 'next/navigation';
 import { Card } from '@/app/components/ui/card';
 import { HelpCircle } from 'lucide-react';
 import { SignOutButton } from '@/app/components/SignOutButton';
+import { format } from 'date-fns';
+import prisma from '@/lib/prisma';
+import { satoshi } from "@/app/fonts/font";
+
+async function getUserStats(userId: string) {
+   const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { createdAt: true }
+   });
+
+   const totalExpenses = await prisma.expense.count({
+      where: { userId }
+   });
+
+   const categoriesUsed = await prisma.expense.findMany({
+      where: { userId },
+      select: { categoryId: true },
+      distinct: ['categoryId']
+   });
+
+   return {
+      memberSince: user?.createdAt || new Date(),
+      totalExpenses,
+      categoriesUsed: categoriesUsed.length
+   };
+}
 
 export default async function ProfilePage() {
    const session = await getServerSession(authOptions);
@@ -13,8 +39,10 @@ export default async function ProfilePage() {
       redirect("/");
    }
 
+   const stats = await getUserStats(session.user.id);
+
    return (
-      <div className="space-y-8">
+      <div className={`space-y-8 ${satoshi.variable} font-satoshi`}>
          {/* Profile Header */}
          <div className="bg-white rounded-lg p-6 shadow-sm border">
             <div className="flex justify-between items-start mb-6">
@@ -45,15 +73,21 @@ export default async function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div className="p-4 bg-purple-50 rounded-lg">
                   <p className="text-sm text-gray-600">Member Since</p>
-                  <p className="text-xl font-semibold text-purple-600">March 2024</p>
+                  <p className="text-xl font-semibold text-purple-600">
+                     {format(stats.memberSince, 'MMMM yyyy')}
+                  </p>
                </div>
                <div className="p-4 bg-green-50 rounded-lg">
                   <p className="text-sm text-gray-600">Total Expenses Tracked</p>
-                  <p className="text-xl font-semibold text-green-600">127</p>
+                  <p className="text-xl font-semibold text-green-600">
+                     {stats.totalExpenses}
+                  </p>
                </div>
                <div className="p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-gray-600">Categories Used</p>
-                  <p className="text-xl font-semibold text-blue-600">8</p>
+                  <p className="text-xl font-semibold text-blue-600">
+                     {stats.categoriesUsed}
+                  </p>
                </div>
             </div>
          </Card>
@@ -71,7 +105,7 @@ export default async function ProfilePage() {
                </div>
                <div className="p-3 bg-purple-50 rounded-lg">
                   <p className="text-sm text-purple-600">
-                     Need help? Contact our support team at support@pocketplanner.com
+                     Need help? Contact our support team at <span className="font-semibold">support@pocketplanner.com</span>
                   </p>
                </div>
             </div>

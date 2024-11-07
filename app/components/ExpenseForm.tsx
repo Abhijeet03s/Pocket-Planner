@@ -17,6 +17,7 @@ import { categories, paymentModes } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DialogClose } from "@/app/components/ui/dialog";
 import { paymentIcons } from "@/lib/types";
+import { satoshi } from "@/app/fonts/font";
 
 const expenseSchema = z.object({
    amount: z.number({
@@ -102,21 +103,27 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
    };
 
    return (
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${satoshi.variable} font-satoshi font-medium`}>
          <div className="space-y-2">
             <label htmlFor="amount" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                Amount
             </label>
-            <Input
-               id="amount"
-               type="number"
-               placeholder="0.00"
-               {...register('amount', { valueAsNumber: true })}
-               className={cn(
-                  "text-lg",
-                  errors.amount && "border-red-500"
-               )}
-            />
+            <div className="relative">
+               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+               <Input
+                  id="amount"
+                  type="number"
+                  placeholder="0.00"
+                  min="0"
+                  {...register('amount', { valueAsNumber: true })}
+                  className={cn(
+                     "text-lg pl-7 [appearance:textfield]",
+                     "[&::-webkit-outer-spin-button]:appearance-none",
+                     "[&::-webkit-inner-spin-button]:appearance-none",
+                     errors.amount && "border-red-500"
+                  )}
+               />
+            </div>
             {errors.amount && (
                <p className="text-sm text-red-500">{errors.amount.message}</p>
             )}
@@ -223,7 +230,7 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                            setValue('date', newDate || new Date());
                            if (newDate) clearErrors('date');
                         }}
-                        initialFocus
+                        initialFocus={true}
                      />
                   </PopoverContent>
                </Popover>

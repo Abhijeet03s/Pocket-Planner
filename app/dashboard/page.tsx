@@ -75,7 +75,7 @@ function DashboardContent() {
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card className="p-6">
                <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-1">
                      <p className="text-sm font-medium text-gray-600">Monthly Budget</p>
                      <p className="text-2xl font-semibold text-gray-900">₹{budgetAmount.toLocaleString()}</p>
                   </div>
@@ -91,7 +91,7 @@ function DashboardContent() {
 
             <Card className="p-6">
                <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-1">
                      <p className="text-sm font-medium text-gray-600">Total Expenses</p>
                      <p className="text-2xl font-semibold text-gray-900">₹{totalExpenses.toLocaleString()}</p>
                   </div>
@@ -107,7 +107,7 @@ function DashboardContent() {
 
             <Card className="p-6">
                <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-1">
                      <p className="text-sm font-medium text-gray-600">Budget Left</p>
                      <p className="text-2xl font-semibold text-gray-900">₹{budgetLeft.toLocaleString()}</p>
                   </div>
