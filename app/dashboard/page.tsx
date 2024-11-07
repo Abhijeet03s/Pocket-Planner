@@ -36,7 +36,7 @@ function DashboardContent() {
    }, 0) || 0;
 
    const budgetAmount = budget?.amount ? Number(budget.amount) : 0;
-   const remaining = Math.max(budgetAmount - totalExpenses, 0);
+   const budgetLeft = Math.max(budgetAmount - totalExpenses, 0);
 
    const budgetUsagePercentage = budgetAmount ? (totalExpenses / budgetAmount) * 100 : 0;
    const isOverBudget = totalExpenses > budgetAmount;
@@ -85,7 +85,7 @@ function DashboardContent() {
                </div>
                <div className={`mt-4 flex items-center text-sm ${budgetStatus.color}`}>
                   {budgetStatus.icon}
-                  <span>₹{remaining.toLocaleString()} remaining</span>
+                  <span>₹{budgetLeft.toLocaleString()} remaining</span>
                </div>
             </Card>
 
@@ -109,7 +109,7 @@ function DashboardContent() {
                <div className="flex items-center justify-between">
                   <div>
                      <p className="text-sm font-medium text-gray-600">Budget Left</p>
-                     <p className="text-2xl font-semibold text-gray-900">₹{remaining.toLocaleString()}</p>
+                     <p className="text-2xl font-semibold text-gray-900">₹{budgetLeft.toLocaleString()}</p>
                   </div>
                   <div className="p-3 bg-emerald-100 rounded-full">
                      <PiggyBank className="w-6 h-6 text-emerald-600" />
@@ -121,7 +121,7 @@ function DashboardContent() {
                         <TrendingDown className="w-4 h-4 mr-1" />}
                   <span>{isOverBudget ? 'Over budget' :
                      isNearBudget ? 'Near budget limit' :
-                        `${((remaining / budgetAmount) * 100).toFixed(1)}% remaining`}</span>
+                        `${((budgetLeft / budgetAmount) * 100).toFixed(1)}% remaining`}</span>
                </div>
             </Card>
          </div>

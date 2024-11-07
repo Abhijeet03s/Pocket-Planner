@@ -2,33 +2,23 @@
 
 import { Card } from "@/app/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-interface ChartData {
-   month: string;
-   spending: number;
-   remaining: number;
-   total: number;
-}
-
-interface CustomTooltipProps {
-   active?: boolean;
-   payload?: Array<{
-      value: number;
-      payload: ChartData;
-   }>;
-}
+import { useQuery } from '@tanstack/react-query';
+import { Loader } from "@/app/components/ui/loader";
+import { BudgetComparisonChartData, BudgetComparisonChartTooltipProps } from "@/lib/types";
 
 export function BudgetComparisonChart() {
-   const chartData: ChartData[] = [
-      { month: 'Jun', spending: 1500, remaining: 1000, total: 2500 },
-      { month: 'Jul', spending: 2000, remaining: 500, total: 2500 },
-      { month: 'Aug', spending: 2200, remaining: 300, total: 2500 },
-      { month: 'Sep', spending: 1800, remaining: 700, total: 2500 },
-      { month: 'Oct', spending: 2400, remaining: 100, total: 2500 },
-      { month: 'Nov', spending: 1500, remaining: 1000, total: 2500 },
-   ];
+   const { data: chartData, isLoading } = useQuery<BudgetComparisonChartData[]>({
+      queryKey: ['budget-comparison'],
+      queryFn: async () => {
+         const response = await fetch('/api/expenses/comparison');
+         if (!response.ok) {
+            throw new Error('Failed to fetch comparison data');
+         }
+         return response.json();
+      },
+   });
 
-   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+   const CustomTooltip = ({ active, payload }: BudgetComparisonChartTooltipProps) => {
       if (!active || !payload?.length) return null;
 
       const spending = payload[0]?.value || 0;
@@ -55,6 +45,22 @@ export function BudgetComparisonChart() {
          </div>
       );
    };
+
+   if (isLoading) {
+      return (
+         <Card className="w-full h-[400px] flex items-center justify-center">
+            <Loader color="blue" />
+         </Card>
+      );
+   }
+
+   if (!chartData?.length) {
+      return (
+         <Card className="w-full h-[400px] flex items-center justify-center">
+            <p className="text-gray-500">No data available</p>
+         </Card>
+      );
+   }
 
    return (
       <Card className="w-full h-[400px]">
