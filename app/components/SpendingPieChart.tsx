@@ -2,11 +2,12 @@
 
 import { Card } from "@/app/components/ui/card";
 import { PieChart, Pie, Legend, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { categories } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from "@/app/components/ui/loader";
 import { ExpenseData, SpendingPieChartTooltipProps, SpendingPieChartData, CustomLabelProps } from "@/lib/types"
+import { ExportButton } from './ExportButton';
 
 export function SpendingPieChart() {
    const currentMonth = format(new Date(), 'yyyy-MM');
@@ -30,6 +31,15 @@ export function SpendingPieChart() {
             };
          });
       }
+   });
+
+   const { data: expenses = [] } = useQuery({
+      queryKey: ['expenses', currentMonth],
+      queryFn: async () => {
+         const response = await fetch(`/api/expenses?month=${currentMonth}`);
+         if (!response.ok) return [];
+         return response.json();
+      },
    });
 
    const totalSpending = data?.reduce((sum, item) => sum + item.value, 0) || 0;
@@ -88,13 +98,20 @@ export function SpendingPieChart() {
    }
 
    return (
-      <Card className="w-full h-[400px]">
-         <div className="p-6 h-full">
+      <Card className="w-full">
+         <div className="p-6">
             <div className="flex items-center justify-between mb-4">
                <div>
-                  <h2 className="text-xl font-semibold">Spending Overview</h2>
+                  <h2 className="text-xl font-semibold">Spending by Category</h2>
                   <p className="text-sm text-gray-500 mt-1">{displayMonth}</p>
                </div>
+               <ExportButton
+                  expenses={expenses}
+                  dateRange={{
+                     from: startOfMonth(new Date()),
+                     to: endOfMonth(new Date())
+                  }}
+               />
             </div>
 
             <div className="h-[300px]">
