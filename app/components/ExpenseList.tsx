@@ -12,6 +12,9 @@ import { ExpensePageSkeleton } from '@/app/components/ExpensePageSkeleton';
 import { DateRange } from "react-day-picker";
 import { Expense } from '@prisma/client';
 import { BudgetIndicator } from '@/app/components/BudgetIndicator';
+import { useState } from 'react';
+import { FilterBar } from './FilterBar';
+import { FilterValues } from '@/lib/types';
 
 interface ExpenseListProps {
    dateRange: DateRange | undefined;
@@ -52,10 +55,48 @@ const deleteExpense = async (id: string) => {
 export function ExpenseList({ dateRange }: ExpenseListProps) {
    const { toast } = useToast();
    const queryClient = useQueryClient();
+   const [filters, setFilters] = useState<FilterValues>({
+      category: null,
+      paymentMode: null,
+      priceSort: null,
+      searchQuery: '',
+   });
 
    const { data: expenses = [], isLoading, isError } = useQuery({
       queryKey: ['expenses', dateRange?.from, dateRange?.to],
       queryFn: () => fetchExpenses(dateRange),
+   });
+
+   const getCategoryDetails = (categoryId: string) => {
+      return categories.find(category => category.id === categoryId) || categories[categories.length - 1];
+   };
+
+   const filteredExpenses = expenses.filter((expense) => {
+      const matchesCategory = !filters.category || expense.categoryId === filters.category;
+      const matchesPaymentMode = !filters.paymentMode || expense.paymentMode === filters.paymentMode;
+
+      const searchQuery = filters.searchQuery.toLowerCase();
+      const category = getCategoryDetails(expense.categoryId);
+      const paymentMode = paymentModes.find(mode => mode.id === expense.paymentMode)?.name || 'Other';
+
+      const matchesSearch = !searchQuery ||
+         category.name.toLowerCase().includes(searchQuery) ||
+         expense.description?.toLowerCase().includes(searchQuery) ||
+         expense.amount.toString().includes(searchQuery) ||
+         format(new Date(expense.date), 'MMM dd, yyyy').toLowerCase().includes(searchQuery) ||
+         paymentMode.toLowerCase().includes(searchQuery);
+
+      return matchesCategory && matchesPaymentMode && matchesSearch;
+   });
+
+   const sortedExpenses = [...filteredExpenses].sort((a, b) => {
+      if (filters.priceSort === 'high-to-low') {
+         return Number(b.amount) - Number(a.amount);
+      }
+      if (filters.priceSort === 'low-to-high') {
+         return Number(a.amount) - Number(b.amount);
+      }
+      return 0;
    });
 
    if (isLoading) {
@@ -65,10 +106,6 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
    if (isError) {
       return <div>Error loading expenses</div>;
    }
-
-   const getCategoryDetails = (categoryId: string) => {
-      return categories.find(category => category.id === categoryId) || categories[categories.length - 1];
-   };
 
    const getExpenseDescription = (description: string | null, categoryName: string) => {
       if (!description || description.trim() === '') {
@@ -98,7 +135,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
    };
 
    const calculateTotalExpenses = () => {
-      return expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+      return filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
    };
 
    const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
@@ -106,6 +143,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
 
    return (
       <div className="space-y-6">
+         <FilterBar onFilterChange={setFilters} />
          <BudgetIndicator month={currentMonth} totalExpenses={totalExpenses} />
          <div className="bg-white rounded-lg border shadow-sm">
             <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 rounded-t-lg border-b">
@@ -118,7 +156,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
             </div>
 
             <div className="divide-y">
-               {expenses.map((expense) => {
+               {sortedExpenses.map((expense) => {
                   const category = getCategoryDetails(expense.categoryId);
                   return (
                      <div key={expense.id} className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-gray-50/50 transition-colors">
@@ -163,7 +201,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
             </div>
          </div>
 
-         {expenses.length === 0 && (
+         {sortedExpenses.length === 0 && (
             <div className="text-center py-12 bg-white rounded-lg border">
                <p className="text-gray-500 text-lg">
                   {dateRange ? (

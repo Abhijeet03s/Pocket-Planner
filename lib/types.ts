@@ -71,3 +71,11 @@ export const paymentIcons = {
 } as const
 
 export type PaymentIconType = keyof typeof paymentIcons
+
+
+export type FilterValues = {
+   category: string | null;
+   priceSort: 'high-to-low' | 'low-to-high' | null;
+   paymentMode: string | null;
+   searchQuery: string;
+};

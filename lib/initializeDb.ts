@@ -23,7 +23,6 @@ export async function initializeCategories() {
          });
       });
 
-      console.log('Categories initialized successfully');
    } catch (error) {
       console.error('Error initializing categories:', error);
       throw error;
