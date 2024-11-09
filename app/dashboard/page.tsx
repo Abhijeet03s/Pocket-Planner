@@ -22,7 +22,7 @@ function DashboardContent() {
    });
 
    const { data: expenses } = useQuery({
-      queryKey: ['expenses', currentMonth],
+      queryKey: ['spending-summary', currentMonth],
       queryFn: async () => {
          const response = await fetch(`/api/expenses/summary?month=${currentMonth}`);
          if (!response.ok) return [];

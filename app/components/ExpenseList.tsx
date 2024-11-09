@@ -205,16 +205,16 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
             <div className="text-center py-12 bg-white rounded-lg border">
                <p className="text-gray-500 text-lg">
                   {dateRange ? (
-                     "No expenses found for the selected period"
+                     "No expenses recorded for this month"
                   ) : (
                      "You haven't added any expenses yet"
                   )}
                </p>
                <p className="text-gray-400 text-sm mt-1">
                   {dateRange ? (
-                     "Try adjusting your date range"
+                     "Try selecting a different month or add new expenses"
                   ) : (
-                     "Click the 'Add Expense' button to get started"
+                     "Click the 'Add Expense' button to start tracking your spending"
                   )}
                </p>
             </div>
