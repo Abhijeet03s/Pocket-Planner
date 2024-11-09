@@ -1,4 +1,4 @@
-import { ShoppingBag, Gift, Pizza, Home, Car, Heart, Briefcase, Music, Shirt, Scissors, BookOpen, Plane, Package, User, Settings, CreditCard } from 'lucide-react';
+import { ShoppingBag, Gift, Pizza, Home, Car, Heart, Briefcase, Music, Shirt, Scissors, BookOpen, Plane, Package, User, CreditCard } from 'lucide-react';
 
 export const categories = [
    { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: '#E9F7EF', textColor: '#27AE60' },
@@ -30,5 +30,4 @@ export const links = [
    { href: "/dashboard", label: "Dashboard", icon: Home },
    { href: "/dashboard/expenses", label: "Expenses", icon: CreditCard },
    { href: "/dashboard/profile", label: "Profile", icon: User },
-   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ] as const;
