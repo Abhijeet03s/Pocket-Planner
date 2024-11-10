@@ -43,22 +43,31 @@ export default async function ProfilePage() {
 
    return (
       <div className={`space-y-8 ${satoshi.variable} font-satoshi`}>
-         {/* Profile Header */}
          <div className="bg-white rounded-lg p-6 shadow-sm border">
             <div className="flex justify-between items-start mb-6">
                <h1 className="text-2xl font-bold">User Profile</h1>
                <SignOutButton />
             </div>
             <div className="flex items-center space-x-8">
-               {session.user?.image && (
+               {session.user?.image ? (
                   <Image
-                     src={session.user.image || "/default-avatar.png"}
+                     src={session.user.image}
                      alt={session.user.name || "User"}
                      width={80}
                      height={80}
                      className="rounded-full"
-                     unoptimized
+                     priority
+                     onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "/default-avatar.png";
+                     }}
                   />
+               ) : (
+                  <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+                     <span className="text-2xl font-semibold text-gray-500">
+                        {session.user?.name?.[0]?.toUpperCase() || '?'}
+                     </span>
+                  </div>
                )}
                <div className="space-y-2">
                   <p className="text-2xl font-semibold">{session.user?.name}</p>
@@ -67,7 +76,6 @@ export default async function ProfilePage() {
             </div>
          </div>
 
-         {/* Account Statistics */}
          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Account Statistics</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -92,7 +100,6 @@ export default async function ProfilePage() {
             </div>
          </Card>
 
-         {/* Help & Support */}
          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Help & Support</h2>
             <div className="space-y-4">

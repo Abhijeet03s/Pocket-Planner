@@ -152,6 +152,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
       }
    };
 
+
    const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
    const totalExpenses = monthlyTotal || 0;
 
@@ -178,7 +179,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                <div className="font-medium text-sm text-gray-600">Amount</div>
                <div className="font-medium text-sm text-gray-600">Date</div>
                <div className="font-medium text-sm text-gray-600">Payment Mode</div>
-               <div className="font-medium text-sm text-gray-600">Actions</div>
+               <div className="font-medium text-sm text-gray-600 pl-2">Actions</div>
             </div>
 
             <div className="divide-y">
@@ -225,15 +226,19 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                   );
                })}
             </div>
-            <div className="p-4 border-t">
-               <Pagination
-                  currentPage={currentPage}
-                  totalPages={data?.totalPages || 1}
-                  onPageChange={handlePageChange}
-               />
+            <div className="p-4 border-t bg-white">
+               <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-500">
+                     Showing {sortedExpenses.length} of {data?.total || 0} expenses
+                  </p>
+                  <Pagination
+                     currentPage={currentPage}
+                     totalPages={data?.totalPages || 1}
+                     onPageChange={handlePageChange}
+                  />
+               </div>
             </div>
          </div>
-
          {sortedExpenses.length === 0 && (
             <div className="text-center py-12 bg-white rounded-lg border">
                <p className="text-gray-500 text-lg">
