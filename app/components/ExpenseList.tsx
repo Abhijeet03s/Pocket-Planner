@@ -15,12 +15,13 @@ import { BudgetIndicator } from '@/app/components/BudgetIndicator';
 import { useState } from 'react';
 import { FilterBar } from './FilterBar';
 import { FilterValues } from '@/lib/types';
+import { Pagination } from "@/app/components/ui/pagination";
 
 interface ExpenseListProps {
    dateRange: DateRange | undefined;
 }
 
-const fetchExpenses = async (dateRange: DateRange | undefined): Promise<Expense[]> => {
+const fetchExpenses = async (dateRange: DateRange | undefined, page: number): Promise<{ expenses: Expense[], total: number, page: number, totalPages: number }> => {
    const queryParams = new URLSearchParams();
    if (dateRange?.from) {
       const startDate = new Date(dateRange.from);
@@ -32,6 +33,8 @@ const fetchExpenses = async (dateRange: DateRange | undefined): Promise<Expense[
       endDate.setHours(23, 59, 59, 999);
       queryParams.append('endDate', endDate.toISOString());
    }
+   queryParams.append('page', page.toString());
+   queryParams.append('limit', '5');
 
    const response = await fetch(`/api/expenses?${queryParams.toString()}`);
    if (!response.ok) {
@@ -55,6 +58,7 @@ const deleteExpense = async (id: string) => {
 export function ExpenseList({ dateRange }: ExpenseListProps) {
    const { toast } = useToast();
    const queryClient = useQueryClient();
+   const [currentPage, setCurrentPage] = useState(1);
    const [filters, setFilters] = useState<FilterValues>({
       category: null,
       paymentMode: null,
@@ -62,16 +66,38 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
       searchQuery: '',
    });
 
-   const { data: expenses = [], isLoading, isError } = useQuery({
-      queryKey: ['expenses', dateRange?.from, dateRange?.to],
-      queryFn: () => fetchExpenses(dateRange),
+   const { data: monthlyTotal } = useQuery({
+      queryKey: ['monthly-total', dateRange?.from, dateRange?.to],
+      queryFn: async () => {
+         const queryParams = new URLSearchParams();
+         if (dateRange?.from) {
+            const startDate = new Date(dateRange.from);
+            startDate.setHours(0, 0, 0, 0);
+            queryParams.append('startDate', startDate.toISOString());
+         }
+         if (dateRange?.to) {
+            const endDate = new Date(dateRange.to);
+            endDate.setHours(23, 59, 59, 999);
+            queryParams.append('endDate', endDate.toISOString());
+         }
+         queryParams.append('type', 'total');
+         const response = await fetch(`/api/expenses/summary?month=${currentMonth}&type=total`);
+         if (!response.ok) return 0;
+         const data = await response.json();
+         return data.total;
+      },
+   });
+
+   const { data, isLoading, isError } = useQuery({
+      queryKey: ['expenses', dateRange?.from, dateRange?.to, currentPage],
+      queryFn: () => fetchExpenses(dateRange, currentPage),
    });
 
    const getCategoryDetails = (categoryId: string) => {
       return categories.find(category => category.id === categoryId) || categories[categories.length - 1];
    };
 
-   const filteredExpenses = expenses.filter((expense) => {
+   const filteredExpenses = data?.expenses.filter((expense) => {
       const matchesCategory = !filters.category || expense.categoryId === filters.category;
       const matchesPaymentMode = !filters.paymentMode || expense.paymentMode === filters.paymentMode;
 
@@ -87,7 +113,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
          paymentMode.toLowerCase().includes(searchQuery);
 
       return matchesCategory && matchesPaymentMode && matchesSearch;
-   });
+   }) || [];
 
    const sortedExpenses = [...filteredExpenses].sort((a, b) => {
       if (filters.priceSort === 'high-to-low') {
@@ -98,14 +124,6 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
       }
       return 0;
    });
-
-   if (isLoading) {
-      return <ExpensePageSkeleton />;
-   }
-
-   if (isError) {
-      return <div>Error loading expenses</div>;
-   }
 
    const getExpenseDescription = (description: string | null, categoryName: string) => {
       if (!description || description.trim() === '') {
@@ -134,12 +152,20 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
       }
    };
 
-   const calculateTotalExpenses = () => {
-      return filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+   const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
+   const totalExpenses = monthlyTotal || 0;
+
+   const handlePageChange = (page: number) => {
+      setCurrentPage(page);
    };
 
-   const currentMonth = dateRange?.from ? format(dateRange.from, 'yyyy-MM') : format(new Date(), 'yyyy-MM');
-   const totalExpenses = calculateTotalExpenses();
+   if (isLoading) {
+      return <ExpensePageSkeleton />;
+   }
+
+   if (isError) {
+      return <div>Error loading expenses</div>;
+   }
 
    return (
       <div className="space-y-6">
@@ -198,6 +224,13 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                      </div>
                   );
                })}
+            </div>
+            <div className="p-4 border-t">
+               <Pagination
+                  currentPage={currentPage}
+                  totalPages={data?.totalPages || 1}
+                  onPageChange={handlePageChange}
+               />
             </div>
          </div>
 

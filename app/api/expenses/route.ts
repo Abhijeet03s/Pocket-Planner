@@ -43,6 +43,9 @@ export async function GET(req: Request) {
    const startDate = searchParams.get('startDate');
    const endDate = searchParams.get('endDate');
    const categoryId = searchParams.get('categoryId');
+   const page = parseInt(searchParams.get('page') || '1');
+   const limit = parseInt(searchParams.get('limit') || '5');
+   const skip = (page - 1) * limit;
 
    let dateFilter = {};
    if (startDate && endDate) {
@@ -60,16 +63,27 @@ export async function GET(req: Request) {
    }
 
    try {
-      const expenses = await prisma.expense.findMany({
-         where: {
-            userId: session.user.id,
-            ...dateFilter,
-            ...categoryFilter,
-         },
-         orderBy: {
-            date: 'desc',
-         },
-      });
+      const [expenses, total] = await Promise.all([
+         prisma.expense.findMany({
+            where: {
+               userId: session.user.id,
+               ...dateFilter,
+               ...categoryFilter,
+            },
+            orderBy: {
+               date: 'desc',
+            },
+            skip,
+            take: limit,
+         }),
+         prisma.expense.count({
+            where: {
+               userId: session.user.id,
+               ...dateFilter,
+               ...categoryFilter,
+            },
+         }),
+      ]);
 
       const jsonSafeExpenses = expenses.map(expense => ({
          ...expense,
@@ -77,7 +91,12 @@ export async function GET(req: Request) {
          date: expense.date.toISOString(),
       }));
 
-      return NextResponse.json(jsonSafeExpenses);
+      return NextResponse.json({
+         expenses: jsonSafeExpenses,
+         total,
+         page,
+         totalPages: Math.ceil(total / limit),
+      });
    } catch (error) {
       console.error('Failed to fetch expenses:', error);
       return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 });
