@@ -9,27 +9,8 @@ export default function Hero() {
    return (
       <div className={`relative bg-hero bg-cover bg-fixed bg-center text-white overflow-hidden ${clashDisplay.variable} ${satoshi.variable}`}>
          <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-900 to-black opacity-85 pointer-events-none animate-gradient" aria-hidden="true"></div>
-
-         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="particles-container">
-               {[...Array(20)].map((_, i) => (
-                  <div
-                     key={i}
-                     className="particle bg-white/10 rounded-full"
-                     style={{
-                        width: Math.random() * 4 + 'px',
-                        height: Math.random() * 4 + 'px',
-                        left: Math.random() * 100 + '%',
-                        animationDelay: Math.random() * 5 + 's',
-                        animationDuration: Math.random() * 10 + 10 + 's'
-                     }}
-                  />
-               ))}
-            </div>
-         </div>
-
-         <div className="relative container max-w-7xl mx-auto min-h-screen px-4 sm:px-6 py-12 sm:py-16 lg:py-24">
-            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+         <div className="relative container max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-24">
+            <div className="flex flex-col items-center justify-center min-h-screen py-20">
                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

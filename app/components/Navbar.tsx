@@ -40,12 +40,10 @@ export default function Navbar() {
                   </Link>
                </div>
 
-               {/* Desktop SignIn Button */}
                <div className="hidden md:block">
                   <SignInButton scrolled={scrolled} />
                </div>
 
-               {/* Mobile Menu Button */}
                <div className="md:hidden">
                   <Button
                      variant="ghost"
@@ -58,16 +56,15 @@ export default function Navbar() {
                         }`}
                   >
                      {mobileMenuOpen ? (
-                        <X className="h-6 w-6" />
+                        <X className="h-6 w-6 text-white" />
                      ) : (
-                        <Menu className="h-6 w-6" />
+                        <Menu className="h-6 w-6 text-white" />
                      )}
                   </Button>
                </div>
             </div>
          </div>
 
-         {/* Mobile Menu */}
          <AnimatePresence>
             {mobileMenuOpen && (
                <motion.div
