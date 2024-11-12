@@ -4,8 +4,22 @@ import Image from 'next/image';
 import dummyDashboard from '../assets/dummy-dashboard.png';
 import { satoshi, clashDisplay } from '@/app/fonts/font';
 import { motion } from 'framer-motion';
+import { useSessionWithCache } from '@/hooks/useSession';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function Hero() {
+   const { session } = useSessionWithCache();
+   const router = useRouter();
+
+   const handleGetStarted = () => {
+      if (session && session.user) {
+         router.push('/dashboard');
+      } else {
+         signIn('google');
+      }
+   };
+
    return (
       <div className={`relative bg-hero bg-cover bg-fixed bg-center text-white overflow-hidden ${clashDisplay.variable} ${satoshi.variable}`}>
          <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-900 to-black opacity-85 pointer-events-none animate-gradient" aria-hidden="true"></div>
@@ -28,6 +42,7 @@ export default function Hero() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                      <motion.button
+                        onClick={handleGetStarted}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="font-satoshi bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-lg font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition-all duration-300 shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2"
