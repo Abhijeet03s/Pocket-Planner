@@ -40,7 +40,7 @@ export default function Hero() {
                   <p className="font-satoshi text-lg sm:text-xl lg:text-2xl text-gray-200 max-w-xl mx-auto">
                      Take control of your expenses with our intelligent tracking and budgeting tools
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <div className="flex flex-col sm:flex-row justify-center">
                      <motion.button
                         onClick={handleGetStarted}
                         whileHover={{ scale: 1.05 }}
@@ -52,9 +52,6 @@ export default function Hero() {
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                      </motion.button>
-                     <button className="font-satoshi bg-white/10 hover:bg-white/20 backdrop-blur-lg text-white text-lg font-bold py-3 px-6 sm:py-4 sm:px-8 rounded-full transition-all duration-300 border border-white/20">
-                        Watch Demo
-                     </button>
                   </div>
                </motion.div>
 
