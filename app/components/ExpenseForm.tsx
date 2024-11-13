@@ -1,6 +1,6 @@
 'use client';
 
-import { createElement, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -16,14 +16,16 @@ import { cn } from '@/lib/utils';
 import { categories, paymentModes } from '@/lib/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DialogClose } from "@/app/components/ui/dialog";
-import { paymentIcons } from "@/lib/types";
 import { satoshi } from "@/app/fonts/font";
 
 const expenseSchema = z.object({
-   amount: z.number({
-      required_error: "Amount is required",
-      invalid_type_error: "Please enter a valid number",
-   }).positive("Amount must be greater than 0"),
+   amount: z.preprocess(
+      (a) => parseFloat(a as string),
+      z.number({
+         required_error: "Amount is required",
+         invalid_type_error: "Please enter a valid number",
+      }).positive("Amount must be greater than 0")
+   ),
    description: z.string().optional(),
    date: z.date({
       required_error: "Date is required",
@@ -64,8 +66,8 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-               amount: data.amount.toString(),
-               description: "",
+               amount: data.amount,
+               description: data.description,
                date: data.date.toISOString(),
                categoryId: data.categoryId,
                paymentMode: data.paymentMode,
@@ -80,7 +82,9 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
          return response.json();
       },
       onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ['budget'] });
          queryClient.invalidateQueries({ queryKey: ['expenses'] });
+         queryClient.invalidateQueries({ queryKey: ['spending-summary'] });
          toast({
             title: "Success",
             description: "Expense created successfully",
@@ -129,6 +133,24 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             )}
          </div>
 
+         <div className="space-y-2">
+            <label htmlFor="description" className="text-sm font-medium leading-none">
+               Description
+            </label>
+            <Input
+               id="description"
+               type="text"
+               placeholder="Enter description"
+               {...register('description')}
+               className={cn(
+                  errors.description && "border-red-500"
+               )}
+            />
+            {errors.description && (
+               <p className="text-sm text-red-500">{errors.description.message}</p>
+            )}
+         </div>
+
          <div className="grid gap-4">
             <div className="space-y-2">
                <label className="text-sm font-medium leading-none">
@@ -151,10 +173,7 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                         <SelectItem key={category.id} value={category.id}>
                            <div className="flex items-center gap-2">
                               <div className="p-1 rounded" style={{ backgroundColor: category.color }}>
-                                 {createElement(category.icon, {
-                                    size: 16,
-                                    style: { color: category.textColor }
-                                 })}
+                                 <span style={{ color: category.textColor }}>{category.icon}</span>
                               </div>
                               <span className="font-medium">{category.name}</span>
                            </div>
@@ -187,10 +206,7 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                      {paymentModes.map((mode) => (
                         <SelectItem key={mode.id} value={mode.id}>
                            <div className="flex items-center gap-2">
-                              {createElement(paymentIcons[mode.icon as keyof typeof paymentIcons], {
-                                 size: 16,
-                                 className: "text-gray-600"
-                              })}
+                              <span>{mode.icon}</span>
                               <span className="font-medium">{mode.name}</span>
                            </div>
                         </SelectItem>

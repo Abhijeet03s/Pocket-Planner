@@ -13,9 +13,13 @@ export async function DELETE(
    }
 
    try {
-      await prisma.expense.delete({
+      const result = await prisma.expense.deleteMany({
          where: { id: params.id, userId: session.user.id },
       });
+
+      if (result.count === 0) {
+         return NextResponse.json({ error: 'Expense not found or unauthorized' }, { status: 404 });
+      }
 
       return NextResponse.json({ message: 'Expense deleted successfully' });
    } catch (error) {

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 if (process.env.NODE_ENV !== 'production') {
-  initializeCategories();
+  initializeCategories().catch(console.error);;
 }
 
 export default function RootLayout({

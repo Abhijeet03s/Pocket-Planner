@@ -6,18 +6,21 @@ import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { categories } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from "@/app/components/ui/loader";
-import { ExpenseData, SpendingPieChartTooltipProps, SpendingPieChartData, CustomLabelProps } from "@/lib/types"
+import { ExpenseData, SpendingPieChartTooltipProps, SpendingPieChartData, CustomLabelProps } from "@/lib/types";
 import { ExportButton } from './ExportButton';
 
 export function SpendingPieChart() {
    const currentMonth = format(new Date(), 'yyyy-MM');
    const displayMonth = format(new Date(), 'MMMM yyyy');
 
-   const { data, isLoading } = useQuery<ExpenseData[], Error, SpendingPieChartData[]>({
+   const { data, isLoading, isError, error } = useQuery<ExpenseData[], Error, SpendingPieChartData[]>({
       queryKey: ['spending-summary', currentMonth],
       queryFn: async () => {
          const response = await fetch(`/api/expenses/summary?month=${currentMonth}`);
-         if (!response.ok) return [];
+         if (!response.ok) {
+            console.error('Failed to fetch spending summary:', response.statusText);
+            return [];
+         }
          return response.json();
       },
       select: (summaryData) => {
@@ -26,7 +29,7 @@ export function SpendingPieChart() {
             return {
                name: category?.id || 'unknown',
                value: item.total,
-               fill: category?.textColor || '#666',
+               fill: category?.color || '#666',
                category: category?.name || 'Unknown'
             };
          });
@@ -37,7 +40,10 @@ export function SpendingPieChart() {
       queryKey: ['expenses', currentMonth],
       queryFn: async () => {
          const response = await fetch(`/api/expenses?month=${currentMonth}`);
-         if (!response.ok) return [];
+         if (!response.ok) {
+            console.error('Failed to fetch expenses:', response.statusText);
+            return [];
+         }
          return response.json();
       },
    });
@@ -91,8 +97,25 @@ export function SpendingPieChart() {
 
    if (isLoading) {
       return (
-         <Card className="w-full h-[400px]">
+         <Card className="w-full h-[400px] flex items-center justify-center">
             <Loader color="blue" />
+         </Card>
+      );
+   }
+
+   if (isError) {
+      return (
+         <Card className="w-full h-[400px] flex items-center justify-center">
+            <p className="text-red-500">Failed to load spending data: {error.message}</p>
+         </Card>
+      );
+   }
+
+   // Handle case when there's no data
+   if (!data || data.length === 0) {
+      return (
+         <Card className="w-full h-[400px] flex items-center justify-center">
+            <p className="text-gray-500">No spending data available for this month.</p>
          </Card>
       );
    }
@@ -128,7 +151,7 @@ export function SpendingPieChart() {
                         paddingAngle={2}
                         dataKey="value"
                      >
-                        {data?.map((entry: SpendingPieChartData, index: number) => (
+                        {data.map((entry: SpendingPieChartData, index: number) => (
                            <Cell
                               key={`cell-${index}`}
                               fill={entry.fill}
@@ -137,7 +160,7 @@ export function SpendingPieChart() {
                            />
                         ))}
                      </Pie>
-                     <Tooltip content={<CustomTooltip active={true} payload={[]} />} />
+                     <Tooltip content={<CustomTooltip />} /> {/* Corrected Tooltip usage */}
                      <Legend
                         align="right"
                         verticalAlign="middle"

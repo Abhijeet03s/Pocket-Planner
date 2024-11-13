@@ -12,6 +12,17 @@ export async function POST(req: Request) {
    try {
       const { amount, description, date, categoryId, paymentMode } = await req.json();
 
+      const category = await prisma.category.findUnique({
+         where: { id: categoryId },
+      });
+
+      if (!category) {
+         return NextResponse.json(
+            { error: 'Invalid category selected' },
+            { status: 400 }
+         );
+      }
+
       const expense = await prisma.expense.create({
          data: {
             amount,

@@ -18,6 +18,9 @@ export function BudgetIndicator({ month, totalExpenses }: BudgetIndicatorProps) 
          if (!response.ok) return null;
          return response.json();
       },
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
    });
 
    if (!budget) return null;

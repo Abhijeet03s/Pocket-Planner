@@ -36,11 +36,11 @@ export function UserProfileSection({ collapsed }: UserProfileSectionProps) {
                   <div className={`flex items-center gap-4 ${collapsed ? 'justify-center' : ''}`}>
                      <div className="relative flex-shrink-0">
                         <Image
-                           src={session.user.image || "/default-avatar.png"}
-                           alt={session.user.name || "User avatar"}
+                           src={session.user.image || ""}
+                           alt={session.user.name || "User"}
                            width={24}
                            height={24}
-                           className="rounded-full object-cover group-hover:opacity-95 transition-opacity"
+                           className="rounded-full"
                            unoptimized
                         />
                      </div>

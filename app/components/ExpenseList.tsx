@@ -2,7 +2,6 @@
 
 import { format } from 'date-fns';
 import { categories } from '../../lib/constants';
-import { createElement } from 'react';
 import { paymentModes } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/app/components/ui/button';
@@ -192,10 +191,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                               className="p-2 rounded-lg flex items-center justify-center"
                               style={{ backgroundColor: category.color }}
                            >
-                              {createElement(category.icon, {
-                                 size: 16,
-                                 style: { color: category.textColor }
-                              })}
+                              <span>{category.icon}</span>
                            </div>
                            <span className="text-sm font-medium text-gray-700">
                               {category.name}
