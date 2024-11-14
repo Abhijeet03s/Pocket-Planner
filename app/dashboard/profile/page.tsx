@@ -56,7 +56,6 @@ export default async function ProfilePage() {
                      width={60}
                      height={60}
                      className="rounded-full"
-                     priority
                   />
                ) : (
                   <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">

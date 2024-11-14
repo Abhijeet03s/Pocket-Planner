@@ -51,14 +51,14 @@ export default function Navbar() {
                      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                      className={`p-2 transition-colors duration-300
                         ${scrolled
-                           ? 'text-gray-900 hover:bg-gray-100'
+                           ? 'text-purple-700 hover:bg-gray-100'
                            : 'text-white hover:bg-white/10'
                         }`}
                   >
                      {mobileMenuOpen ? (
-                        <X className="h-6 w-6 text-white" />
+                        <X className={`h-6 w-6 ${scrolled ? 'text-purple-700' : 'text-white'} hover:text-purple-700`} />
                      ) : (
-                        <Menu className="h-6 w-6 text-white" />
+                        <Menu className={`h-6 w-6 ${scrolled ? 'text-purple-700' : 'text-white'} hover:text-purple-700`} />
                      )}
                   </Button>
                </div>

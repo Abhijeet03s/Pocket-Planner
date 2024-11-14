@@ -26,10 +26,10 @@ export function SignInButton({ scrolled, className }: SignInButtonProps) {
             <Button
                variant="ghost"
                onClick={() => router.push('/dashboard')}
-               className={`font-medium px-5 h-10
+               className={`font-semibold px-5 h-10
                   ${scrolled
-                     ? 'text-gray-800'
-                     : 'text-gray-100'
+                     ? 'text-purple-700'
+                     : 'text-gray-100 border-purple-700'
                   }`}
             >
                Dashboard
@@ -57,7 +57,11 @@ export function SignInButton({ scrolled, className }: SignInButtonProps) {
          <Button
             variant="default"
             onClick={() => signIn('google')}
-            className={`bg-white text-purple-700 shadow-lg shadow-purple-700/20 hover:bg-purple-700 hover:text-white transition-colors duration-300 ${satoshi.className}`}
+            className={`px-5 h-10 font-semibold transition-all duration-300 ${satoshi.className}
+               ${scrolled
+                  ? 'bg-purple-700 text-white shadow-lg shadow-purple-700/30 hover:bg-purple-800 hover:shadow-purple-800/40'
+                  : 'bg-transparent text-white border border-white/80 hover:bg-white hover:text-purple-700 hover:border-transparent'
+               }`}
          >
             Sign in
          </Button>
