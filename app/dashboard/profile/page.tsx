@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/authOptions';
 import { redirect } from 'next/navigation';
 import { Card } from '@/app/components/ui/card';
 import { HelpCircle } from 'lucide-react';
-import { SignOutButton } from '@/app/components/SignOutButton';
 import { format } from 'date-fns';
 import prisma from '@/lib/prisma';
 import { satoshi } from "@/app/fonts/font";
@@ -46,7 +45,6 @@ export default async function ProfilePage() {
          <div className="bg-white rounded-lg p-6 shadow-sm border">
             <div className="flex justify-between items-start mb-6">
                <h1 className="text-2xl font-bold">User Profile</h1>
-               <SignOutButton />
             </div>
             <div className="flex items-center space-x-8">
                {session.user?.image ? (
