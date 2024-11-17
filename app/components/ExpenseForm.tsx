@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -173,7 +173,10 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                         <SelectItem key={category.id} value={category.id}>
                            <div className="flex items-center gap-2">
                               <div className="p-1 rounded" style={{ backgroundColor: category.color }}>
-                                 <span style={{ color: category.textColor }}>{category.icon}</span>
+                                 {React.createElement(category.icon, {
+                                    className: "w-4 h-4 text-white",
+                                    strokeWidth: 2
+                                 })}
                               </div>
                               <span className="font-medium">{category.name}</span>
                            </div>
@@ -206,7 +209,13 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                      {paymentModes.map((mode) => (
                         <SelectItem key={mode.id} value={mode.id}>
                            <div className="flex items-center gap-2">
-                              <span>{mode.icon}</span>
+                              <div className="p-1.5 rounded-md flex items-center justify-center" style={{ backgroundColor: mode.bgColor }}>
+                                 {React.createElement(mode.icon, {
+                                    className: "w-3 h-3",
+                                    style: { color: mode.color },
+                                    strokeWidth: 2
+                                 })}
+                              </div>
                               <span className="font-medium">{mode.name}</span>
                            </div>
                         </SelectItem>

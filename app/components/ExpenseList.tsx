@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { format } from 'date-fns';
 import { categories } from '../../lib/constants';
 import { paymentModes } from '@/lib/constants';
@@ -15,6 +16,7 @@ import { useState } from 'react';
 import { FilterBar } from './FilterBar';
 import { FilterValues } from '@/lib/types';
 import { Pagination } from "@/app/components/ui/pagination";
+import { CircleDollarSign } from 'lucide-react';
 
 interface ExpenseListProps {
    dateRange: DateRange | undefined;
@@ -188,10 +190,16 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                      <div key={expense.id} className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-gray-50/50 transition-colors">
                         <div className="flex items-center gap-2">
                            <div
-                              className="p-2 rounded-lg flex items-center justify-center"
-                              style={{ backgroundColor: category.color }}
+                              className="p-2.5 rounded-lg flex items-center justify-center transition-transform hover:scale-105"
+                              style={{
+                                 backgroundColor: category.bgColor,
+                              }}
                            >
-                              <span>{category.icon}</span>
+                              {React.createElement(category.icon, {
+                                 className: "w-4 h-4",
+                                 style: { color: category.color },
+                                 strokeWidth: 2
+                              })}
                            </div>
                            <span className="text-sm font-medium text-gray-700">
                               {category.name}
@@ -206,8 +214,22 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                         <div className="text-sm text-gray-600">
                            {format(new Date(expense.date), 'MMM dd, yyyy')}
                         </div>
-                        <div className="text-sm text-gray-600">
-                           {paymentModes.find(mode => mode.id === expense.paymentMode)?.name || 'Other'}
+                        <div className="flex items-center gap-2">
+                           <div
+                              className="p-2.5 rounded-lg flex items-center justify-center transition-transform hover:scale-105"
+                              style={{
+                                 backgroundColor: paymentModes.find(mode => mode.id === expense.paymentMode)?.bgColor || '#e5e7eb',
+                              }}
+                           >
+                              {React.createElement(paymentModes.find(mode => mode.id === expense.paymentMode)?.icon || CircleDollarSign, {
+                                 className: "w-4 h-4",
+                                 style: { color: paymentModes.find(mode => mode.id === expense.paymentMode)?.color || '#9ca3af' },
+                                 strokeWidth: 2
+                              })}
+                           </div>
+                           <span className="text-sm font-medium text-gray-700">
+                              {paymentModes.find(mode => mode.id === expense.paymentMode)?.name || 'Other'}
+                           </span>
                         </div>
                         <div>
                            <Button

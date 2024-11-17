@@ -66,7 +66,7 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
                   value={filters.category || "all"}
                   onValueChange={(value) => handleFilterChange('category', value)}
                >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[170px]">
                      <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -82,13 +82,14 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
 
             <div>
                <Select
-                  value={filters.priceSort || ""}
-                  onValueChange={(value) => handleFilterChange('priceSort', value as 'high-to-low' | 'low-to-high' | null)}
+                  value={filters.priceSort || "all"}
+                  onValueChange={(value) => handleFilterChange('priceSort', value === 'all' ? null : value as 'high-to-low' | 'low-to-high')}
                >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[160px]">
                      <SelectValue placeholder="Sort by Price" />
                   </SelectTrigger>
                   <SelectContent>
+                     <SelectItem value="all">Sort by Price</SelectItem>
                      <SelectItem value="high-to-low">Highest to Lowest</SelectItem>
                      <SelectItem value="low-to-high">Lowest to Highest</SelectItem>
                   </SelectContent>

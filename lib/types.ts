@@ -88,3 +88,11 @@ export interface Category {
    color: string;
    bgColor: string;
 }
+
+export interface PaymentMode {
+   id: string;
+   name: string;
+   icon: LucideIcon;
+   color: string;
+   bgColor: string;
+}
