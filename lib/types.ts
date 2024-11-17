@@ -6,7 +6,8 @@ import {
    Smartphone,
    Laptop,
    Landmark,
-   MoreHorizontal
+   MoreHorizontal,
+   LucideIcon
 } from "lucide-react";
 
 export interface ExpenseData {
@@ -79,3 +80,11 @@ export type FilterValues = {
    paymentMode: string | null;
    searchQuery: string;
 };
+
+export interface Category {
+   id: string;
+   name: string;
+   icon: LucideIcon;
+   color: string;
+   bgColor: string;
+}

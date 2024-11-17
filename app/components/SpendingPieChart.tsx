@@ -81,7 +81,7 @@ export function SpendingPieChart() {
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-      return percent > 0.05 ? (
+      return percent > 0.03 ? (
          <text
             x={x}
             y={y}
@@ -111,7 +111,6 @@ export function SpendingPieChart() {
       );
    }
 
-   // Handle case when there's no data
    if (!data || data.length === 0) {
       return (
          <Card className="w-full h-[400px] flex items-center justify-center">
@@ -160,7 +159,7 @@ export function SpendingPieChart() {
                            />
                         ))}
                      </Pie>
-                     <Tooltip content={<CustomTooltip />} /> {/* Corrected Tooltip usage */}
+                     <Tooltip content={<CustomTooltip />} />
                      <Legend
                         align="right"
                         verticalAlign="middle"
