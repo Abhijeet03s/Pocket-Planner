@@ -35,14 +35,17 @@ export function UserProfileSection({ collapsed }: UserProfileSectionProps) {
                >
                   <div className={`flex items-center gap-4 ${collapsed ? 'justify-center' : ''}`}>
                      <div className="relative flex-shrink-0">
-                        <Image
-                           src={session.user.image || ""}
-                           alt={session.user.name || "User"}
-                           width={24}
-                           height={24}
-                           className="rounded-full"
-                           unoptimized
-                        />
+                        {session.user.image && (
+                           <Image
+                              src={session.user.image}
+                              alt={session.user.name || "User"}
+                              width={24}
+                              height={24}
+                              className="rounded-full"
+                              unoptimized
+                              referrerPolicy="no-referrer"
+                           />
+                        )}
                      </div>
                      {!collapsed && (
                         <div className="flex-1 text-left min-w-0">

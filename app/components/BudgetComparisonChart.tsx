@@ -64,7 +64,7 @@ export function BudgetComparisonChart() {
 
    return (
       <Card className="w-full">
-         <div className="p-6 h-full">
+         <div className="p-6">
             <div className="flex items-center justify-between mb-4">
                <div>
                   <h2 className="text-xl font-semibold">Budget Overview</h2>
