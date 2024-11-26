@@ -255,7 +255,6 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                            setValue('date', newDate || new Date());
                            if (newDate) clearErrors('date');
                         }}
-                        initialFocus={true}
                      />
                   </PopoverContent>
                </Popover>

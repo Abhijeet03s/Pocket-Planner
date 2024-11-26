@@ -21,7 +21,7 @@ export function MonthSelector({ date, onDateChange }: MonthSelectorProps) {
       const start = new Date(year, monthIndex, 1);
       const end = new Date(year, monthIndex + 1, 0);
       onDateChange({ from: start, to: end });
-      setOpen(false); // Close the popover after selection
+      setOpen(false);
    };
 
    return (
@@ -45,7 +45,7 @@ export function MonthSelector({ date, onDateChange }: MonthSelectorProps) {
          <PopoverContent className="w-auto p-0" align="start">
             <div className="p-3">
                <select
-                  className="w-full p-2 border rounded-md mb-2"
+                  className="w-full p-2 border rounded-md mb-2 cursor-pointer hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                   value={date?.from ? format(date.from, 'yyyy') : new Date().getFullYear()}
                   onChange={(e) => {
                      const year = parseInt(e.target.value);
@@ -56,9 +56,14 @@ export function MonthSelector({ date, onDateChange }: MonthSelectorProps) {
                   }}
                >
                   {Array.from({ length: 10 }, (_, i) => {
-                     const year = new Date().getFullYear() - 5 + i;
+                     const currentYear = new Date().getFullYear();
+                     const year = currentYear - 5 + i;
                      return (
-                        <option key={year} value={year}>
+                        <option
+                           key={year}
+                           value={year}
+                           className="py-1"
+                        >
                            {year}
                         </option>
                      );

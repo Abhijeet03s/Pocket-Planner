@@ -244,7 +244,7 @@ export function ExpenseList({ dateRange }: ExpenseListProps) {
                   );
                })}
             </div>
-            <div className="p-4 border-t bg-white">
+            <div className="p-4 border-t">
                <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-500">
                      Showing {sortedExpenses.length} of {data?.total || 0} expenses
