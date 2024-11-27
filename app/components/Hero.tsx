@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import dummyDashboard from '../assets/dummy-dashboard.png';
+import dummyDashboard from '@/app/assets/expense-dashboard.png';
 import { satoshi, clashDisplay } from '@/app/fonts/font';
 import { motion } from 'framer-motion';
 import { useSessionWithCache } from '@/hooks/useSession';

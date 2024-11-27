@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { BarChart3, PieChart, Calendar, Wallet, CreditCard, ArrowDownToLine } from "lucide-react";
 import { satoshi, clashDisplay } from '@/app/fonts/font';
 import { Card } from "@/app/components/ui/card";
-import dashboardPreview from '../assets/dummy-dashboard.png';
+import dashboardPreview from '@/app/assets/expense-dashboard.png';
 
 export default function Features() {
    const features = [
@@ -145,9 +145,8 @@ export default function Features() {
                            src={dashboardPreview}
                            alt="Dashboard Preview"
                            width={1000}
-                           height={562}
+                           height={500}
                            className="rounded-lg shadow-xl sm:shadow-2xl w-full h-auto"
-                           priority
                         />
                      </div>
                   </motion.div>
