@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏦 PocketPlanner
 
-## Getting Started
+PocketPlanner is a comprehensive expense tracking and budgeting application built with modern web technologies. It helps users manage their finances effectively through intuitive interfaces and powerful analytics.
 
-First, run the development server:
+## ✨ Key Features
+
+### 💰 Smart Expense Tracking
+- **Unified Dashboard**: View all expenses and budgets in one place
+- **Category Management**: Organize expenses by customizable categories
+- **Payment Mode Tracking**: Track expenses across different payment methods
+
+### 📊 Financial Analytics
+- **Budget Overview**: Compare monthly spending against set budgets
+- **Category Analysis**: Visualize spending patterns through interactive pie charts
+- **Monthly Comparisons**: Track spending trends over the last 6 months
+
+### 💳 Budget Management
+- **Monthly Budgets**: Set and track monthly spending limits
+- **Visual Indicators**: Get real-time budget status with progress bars
+- **Overspending Alerts**: Receive warnings when nearing or exceeding budget
+
+### 📱 Modern UI/UX
+- **Animated Interfaces**: Smooth transitions powered by Framer Motion
+- **Dark Mode Support**: Coming soon
+
+## 🛠️ Tech Stack
+
+### Frontend
+- Next.js 14
+- React 18
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- React Query (TanStack Query)
+- Shadcn UI Components
+
+### Backend
+- PostgreSQL
+- Prisma ORM
+- NextAuth.js
+- Supabase
+
+### Development & Deployment
+- Vercel
+- Sharp (Image Optimization)
+- ESLint
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm
+- PostgreSQL database
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+      git clone https://github.com/yourusername/Pocket-Planner.git
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+      npm install
+   ```
+
+3. **Set up environment variables**
+   - Create a `.env` file with:
+   ```bash
+   DATABASE_URL="postgresql://..."
+   NEXTAUTH_SECRET="your-secret"
+   GOOGLE_CLIENT_ID="your-client-id"
+   GOOGLE_CLIENT_SECRET="your-client-secret"
+   ```
+
+4. **Start development server**
+
+   ```bash
+      npm run dev
+   ```
+
+
+## 📦 Database Management
+
+### Initialize Prisma
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run prisma:migrate
+```
+### Push schema changes
+
+```bash
+npm run prisma:db-push
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📄 License
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📧 Contact
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For support or inquiries:
+- Email: abhijeetsharma476@gmail.com

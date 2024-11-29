@@ -105,7 +105,7 @@ export default async function ProfilePage() {
                </div>
                <div className="p-3 bg-purple-50 rounded-lg">
                   <p className="text-sm text-purple-600">
-                     Need help? Contact our support team at <span className="font-semibold">support@pocketplanner.com</span>
+                     Need help? Contact our support team at <span className="font-semibold">abhijeetsharma476@gmail.com</span>
                   </p>
                </div>
             </div>
