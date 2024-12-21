@@ -54,21 +54,21 @@ export default function Footer() {
                      Follow Us
                   </h3>
                   <div className="flex space-x-4 justify-center">
-                     <Link href="https://github.com"
+                     <Link href="https://github.com/Abhijeet03s"
                         className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-700 transition-all"
                         target="_blank"
                         rel="noopener noreferrer"
                      >
                         <Github className="w-4 h-4" />
                      </Link>
-                     <Link href="https://twitter.com"
+                     <Link href="https://x.com/iabhi43"
                         className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-700 transition-all"
                         target="_blank"
                         rel="noopener noreferrer"
                      >
                         <Twitter className="w-4 h-4" />
                      </Link>
-                     <Link href="mailto:support@pocketplanner.com"
+                     <Link href="mailto:support@abhijeetsharma476@gmail.com"
                         className="p-2 bg-gray-800 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-gray-700 transition-all"
                         target="_blank"
                         rel="noopener noreferrer"
